@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dashboard Ejecutivo — Contratos FDL Kennedy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0A2463;--blue:#1565C0;--blue2:#1976D2;
+  --red:#C62828;--red2:#FFEBEE;--red3:#FFCDD2;
+  --amber:#F57F17;--amber2:#FFF8E1;--amber3:#FFE0B2;
+  --green:#00A878;--green2:#E8F5E9;
+  --bg:#F0F4F8;--white:#FFFFFF;
+  --sh:0 2px 8px rgba(0,0,0,.10);--sh2:0 4px 20px rgba(0,0,0,.14);
+  --r:12px;--r2:8px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);margin:0;padding:0;font-family:'Inter',sans-serif;font-size:14px;color:#1a2340}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s}
+#loader span{color:white;font-size:1rem;font-weight:600;letter-spacing:2px;animation:pulse 1s infinite alternate}
+@keyframes pulse{from{opacity:.4}to{opacity:1}}
+
+/* TOPBAR */
+#topbar{position:sticky;top:0;z-index:100;height:56px;background:linear-gradient(90deg,#07183a 0%,#0a2463 60%,#1565C0 100%);
+  display:flex;align-items:center;justify-content:space-between;padding:0 20px;
+  box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.logo-pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:4px 14px;color:white;font-weight:800;font-size:1rem;letter-spacing:1px}
+.topbar-title{color:rgba(255,255,255,.85);font-size:.82rem;font-weight:500;letter-spacing:.3px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.source-pill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);
+  border-radius:20px;padding:4px 12px;color:rgba(255,255,255,.8);font-size:.75rem}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot.live{background:#00e676;box-shadow:0 0 6px #00e676}
+.dot.embedded{background:#FFD600}
+.topbar-date{color:rgba(255,255,255,.6);font-size:.75rem}
+.btn-print{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:8px;
+  color:white;padding:5px 14px;font-size:.78rem;cursor:pointer;transition:background .2s}
+.btn-print:hover{background:rgba(255,255,255,.25)}
+
+/* HERO */
+#hero{background:linear-gradient(135deg,#07183a 0%,#0d2a5e 50%,#1565C0 100%);
+  padding:18px 20px;display:flex;align-items:stretch;gap:0}
+.hero-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:10px 16px;position:relative}
+.hero-col+.hero-col::before{content:'';position:absolute;left:0;top:10%;height:80%;
+  width:1px;background:rgba(255,255,255,.15)}
+.hero-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  color:rgba(255,255,255,.55);margin-bottom:6px;text-align:center}
+.hero-val{font-size:2rem;font-weight:800;line-height:1;text-align:center;color:white}
+.hero-val.red{color:#EF9A9A}
+.hero-val.amber{color:#FFCC02}
+.hero-val.blue{color:#82B1FF}
+.hero-sub{font-size:.7rem;color:rgba(255,255,255,.5);margin-top:4px;text-align:center}
+.hero-rings{display:flex;gap:10px;align-items:center}
+.ring-group{display:flex;flex-direction:column;align-items:center;gap:2px}
+.ring-label{font-size:.6rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px}
+
+/* SECTIONS */
+.section{padding:0 0 8px}
+.section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  color:var(--navy);padding:12px 28px 6px;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';width:3px;height:16px;background:var(--blue);border-radius:2px;flex-shrink:0}
+.section-body{padding:0 20px 16px}
+
+/* ESTADO CONTRACTUAL — TILES */
+.est-tiles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.est-tile{background:white;border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);transition:box-shadow .2s;border-top:3px solid transparent}
+.est-tile:hover{box-shadow:var(--sh2)}
+.est-tile-lbl{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.est-tile-num{font-size:2.4rem;font-weight:800;color:#112;line-height:1;margin-bottom:2px}
+.est-tile-sub{font-size:.68rem;color:#667;font-weight:500}
+.est-tile-val{font-size:.72rem;font-weight:600;color:#445;margin-top:3px}
+.est-tile-bar{height:4px;background:#e8edf5;border-radius:2px;margin-top:10px;overflow:hidden}
+/* DONUT ESTADO */
+.donut-card{background:white;border-radius:var(--r);padding:16px 20px;box-shadow:var(--sh);margin-top:12px}
+.donut-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.donut-title{font-size:.72rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px}
+.donut-filters{display:flex;gap:5px;flex-wrap:wrap}
+.df-btn{padding:4px 13px;border:1.5px solid #d0d8e8;border-radius:20px;background:white;font-size:.7rem;font-weight:600;color:#556;cursor:pointer;transition:all .18s}
+.df-btn:hover{border-color:var(--blue);color:var(--blue)}
+.df-btn.df-active{background:var(--navy);border-color:var(--navy);color:white}
+.donut-body{display:flex;align-items:center;gap:28px;flex-wrap:wrap;justify-content:center}
+.donut-legend{display:flex;flex-direction:column;gap:7px;min-width:200px}
+.dl-item{display:flex;align-items:center;gap:9px}
+.dl-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.dl-label{font-size:.75rem;font-weight:600;color:#334;flex:1}
+.dl-count{font-size:.9rem;font-weight:800;color:#112;min-width:24px;text-align:right}
+.dl-pct{font-size:.66rem;color:#889;min-width:38px;text-align:right}
+/* PORTFOLIO STRIP */
+#portfolio-strip{height:28px;display:flex;overflow:hidden}
+.strip-seg{height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.strip-seg span{font-size:.6rem;font-weight:700;color:white;white-space:nowrap;padding:0 6px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+
+/* BRECHA */
+.brecha-wrap{display:flex;gap:16px}
+.brecha-left{flex:0 0 58%}
+.brecha-right{flex:1}
+.chart-card{background:white;border-radius:var(--r);padding:16px;box-shadow:var(--sh);height:340px;position:relative}
+.chart-card canvas{max-height:300px}
+.chart-title{font-size:.72rem;font-weight:700;color:var(--navy);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+
+/* EQUIPO CARDS */
+.equipo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.eq-card{background:white;border-radius:var(--r);padding:14px;box-shadow:var(--sh);
+  border-left:4px solid var(--green);transition:box-shadow .2s}
+.eq-card:hover{box-shadow:var(--sh2)}
+.eq-card.risk-high{border-left-color:var(--red);background:linear-gradient(to right,#fff5f5,white)}
+.eq-card.risk-mid{border-left-color:var(--amber);background:linear-gradient(to right,#fffaf0,white)}
+.eq-card.risk-low{border-left-color:var(--green);background:linear-gradient(to right,#f0fff8,white)}
+.eq-name{font-size:.72rem;font-weight:700;color:var(--navy);text-transform:uppercase;
+  letter-spacing:.3px;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.eq-body{display:flex;align-items:center;gap:10px}
+.eq-stats{flex:1;min-width:0}
+.eq-count{font-size:.75rem;color:#556;margin-bottom:2px}
+.eq-val{font-size:.88rem;font-weight:700;color:var(--navy)}
+.eq-bar-wrap{margin-top:8px}
+.eq-bar-label{display:flex;justify-content:space-between;font-size:.62rem;color:#778;margin-bottom:3px}
+.eq-bar-bg{height:6px;background:#e0e8f0;border-radius:3px;overflow:hidden}
+.eq-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+.eq-bar-fill.red{background:var(--red)}
+.eq-bar-fill.amber{background:var(--amber)}
+.eq-bar-fill.green{background:var(--green)}
+
+/* COLLAPSIBLE TABLE */
+#btn-toggle-table{display:block;width:calc(100% - 40px);margin:0 20px 8px;
+  background:var(--navy);color:white;border:none;border-radius:var(--r2);
+  padding:12px 20px;font-size:.82rem;font-weight:600;cursor:pointer;text-align:left;
+  letter-spacing:.3px;transition:background .2s}
+#btn-toggle-table:hover{background:var(--blue)}
+#detail-section{display:none;padding:0 20px 20px}
+.filter-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;
+  background:white;padding:10px 14px;border-radius:var(--r2);box-shadow:var(--sh)}
+.filter-row select,.filter-row input{
+  border:1px solid #d0dcea;border-radius:6px;padding:5px 10px;font-size:.78rem;
+  background:white;color:#334;font-family:inherit;outline:none}
+.filter-row select:focus,.filter-row input:focus{border-color:var(--blue)}
+.btn-limpiar,.btn-csv{border:none;border-radius:6px;padding:5px 12px;font-size:.75rem;
+  font-weight:600;cursor:pointer;transition:all .2s}
+.btn-limpiar{background:#e8edf5;color:var(--navy)}
+.btn-limpiar:hover{background:#d0dcea}
+.btn-csv{background:var(--green);color:white}
+.btn-csv:hover{background:#00876a}
+.tbl-wrap{overflow-x:auto;border-radius:var(--r2);box-shadow:var(--sh)}
+table{width:100%;border-collapse:collapse;background:white;font-size:.76rem}
+thead th{background:var(--navy);color:white;padding:9px 10px;text-align:left;
+  font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  cursor:pointer;white-space:nowrap;user-select:none}
+thead th:hover{background:var(--blue)}
+thead th.sort-asc::after{content:' ▲'}
+thead th.sort-desc::after{content:' ▼'}
+tbody tr{border-bottom:1px solid #e8edf5;transition:background .15s}
+tbody tr:hover{background:#f5f8ff}
+tbody tr.row-vencido{background:#fff5f5}
+tbody tr.row-vencido:hover{background:#ffe8e8}
+tbody tr.row-urgente{background:#fffbf0}
+tbody tr.row-urgente:hover{background:#fff5e0}
+td{padding:7px 10px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.badge-vencido{background:var(--red3);color:var(--red)}
+.badge-urgente{background:var(--amber3);color:#7f4800}
+.badge-judicial{background:#e8d5f5;color:#5e0090}
+.badge-normal{background:#e8f5e9;color:#1b5e20}
+.pagination{display:flex;align-items:center;gap:6px;margin-top:10px;justify-content:center;flex-wrap:wrap}
+.pg-btn{border:1px solid #d0dcea;border-radius:6px;padding:4px 10px;
+  background:white;font-size:.75rem;cursor:pointer;color:var(--navy);transition:all .2s}
+.pg-btn:hover,.pg-btn.active{background:var(--navy);color:white;border-color:var(--navy)}
+.pg-info{font-size:.74rem;color:#778;padding:0 6px}
+
+/* MODAL */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+  align-items:center;justify-content:center}
+#modal-overlay.open{display:flex}
+#modal-box{background:white;border-radius:var(--r);padding:28px;max-width:560px;width:92%;
+  box-shadow:0 8px 40px rgba(0,0,0,.25);max-height:85vh;overflow-y:auto;position:relative}
+#modal-close{position:absolute;top:12px;right:14px;background:none;border:none;
+  font-size:1.3rem;cursor:pointer;color:#778;transition:color .2s}
+#modal-close:hover{color:var(--red)}
+#modal-content h2{font-size:1rem;color:var(--navy);margin-bottom:14px;padding-right:24px}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mg-item{background:#f5f8ff;border-radius:8px;padding:10px 12px}
+.mg-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#778;margin-bottom:3px}
+.mg-val{font-size:.88rem;font-weight:600;color:var(--navy);word-break:break-word}
+
+/* GAUGE */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center}
+.gauge-label-score{font-size:.78rem;font-weight:700;color:white;margin-top:2px;text-align:center;letter-spacing:.5px}
+
+/* MISC */
+.fis-bar{width:50px;height:5px;background:#334;border-radius:3px;display:inline-block;vertical-align:middle;position:relative;overflow:hidden}
+.fis-bar-fill{height:100%;background:var(--blue2);border-radius:3px}
+.val-col{font-weight:700;color:var(--navy)}
+.num-col{font-weight:700;font-size:.72rem}
+
+@media print{
+  #topbar{position:relative}
+  #btn-toggle-table,#detail-section,#loader{display:none!important}
+  body{background:white}
+}
+@media(max-width:900px){
+  .brecha-wrap{flex-direction:column}
+  .brecha-left,.brecha-right{flex:none;width:100%}
+  .hero-val{font-size:1.4rem}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader"><span>CARGANDO DASHBOARD&hellip;</span></div>
+
+<!-- TOPBAR -->
+<header id="topbar">
+  <div class="topbar-left">
+    <div class="logo-pill">ALK.</div>
+    <div class="topbar-title">Dashboard Ejecutivo &mdash; Contratos FDL Kennedy</div>
+  </div>
+  <div class="topbar-right">
+    <div class="source-pill" id="source-pill">
+      <div class="dot embedded"></div>
+      <span class="source-label">Datos embebidos</span>
+    </div>
+    <span class="topbar-date" id="topbar-date">25 de junio de 2026</span>
+    <button class="btn-print" onclick="window.print()">&#128438; Imprimir</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div id="hero">
+  <div class="hero-col">
+    <div class="hero-label">Portafolio Total</div>
+    <div class="hero-val blue" id="hero-val-total">&ndash;</div>
+    <div class="hero-sub" id="hero-sub-total">204 contratos</div>
+  </div>
+  <div class="hero-col" id="hero-kpi-liq" style="border-top:3px solid #E65100">
+    <div class="hero-label" style="color:#FFAB40">En Liquidaci&oacute;n</div>
+    <div class="hero-val amber" id="hero-val-liq">&ndash;</div>
+    <div class="hero-sub" id="hero-sub-liq">requieren cierre administrativo</div>
+  </div>
+  <div class="hero-col" id="hero-kpi-hist" style="border-top:3px solid #EF5350">
+    <div class="hero-label" style="color:#EF9A9A">Hist&oacute;rico 2022 Abierto</div>
+    <div class="hero-val red" id="hero-val-hist">&ndash;</div>
+    <div class="hero-sub" id="hero-sub-hist">contratos 2022 sin liquidar</div>
+  </div>
+  <div class="hero-col" id="hero-kpi-ejec" style="border-top:3px solid #1565C0">
+    <div class="hero-label" style="color:#82B1FF">En Ejecuci&oacute;n</div>
+    <div class="hero-val blue" id="hero-val-ejec">&ndash;</div>
+    <div class="hero-sub" id="hero-sub-ejec">activos actualmente</div>
+  </div>
+  <div class="hero-col" id="hero-kpi-area" style="border-top:3px solid #F9A825">
+    <div class="hero-label" style="color:#FFD54F">&Aacute;rea Cr&iacute;tica</div>
+    <div class="hero-val amber" id="hero-val-area" style="font-size:1.15rem;line-height:1.2">&ndash;</div>
+    <div class="hero-sub" id="hero-sub-area">mayor carga en liquidaci&oacute;n</div>
+  </div>
+</div>
+<div id="portfolio-strip"></div>
+
+<!-- SECTION 1: ESTADO CONTRACTUAL TOTAL -->
+<div class="section">
+  <div class="section-title">Estado Contractual del Portafolio &mdash; 204 Contratos</div>
+  <div class="section-body">
+    <div id="estado-tiles" class="est-tiles-grid"></div>
+    <div class="donut-card">
+      <div class="donut-header">
+        <div class="donut-title">Distribuci&oacute;n por estado contractual</div>
+        <div class="donut-filters">
+          <button class="df-btn df-active" data-year="todos" onclick="filtrarDonut('todos')">Todos</button>
+          <button class="df-btn" data-year="2022" onclick="filtrarDonut('2022')">2022</button>
+          <button class="df-btn" data-year="2023" onclick="filtrarDonut('2023')">2023</button>
+          <button class="df-btn" data-year="2024" onclick="filtrarDonut('2024')">2024</button>
+          <button class="df-btn" data-year="2025" onclick="filtrarDonut('2025')">2025</button>
+          <button class="df-btn" data-year="2026" onclick="filtrarDonut('2026')">2026</button>
+        </div>
+      </div>
+      <div class="donut-body">
+        <div style="position:relative;height:260px;width:260px;flex-shrink:0"><canvas id="estado-donut-canvas"></canvas></div>
+        <div id="donut-legend" class="donut-legend"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: ESTADO POR AÑO -->
+<div class="section">
+  <div class="section-title">Comportamiento del Estado por A&ntilde;o de Inicio</div>
+  <div class="section-body">
+    <div class="chart-card" style="height:auto;padding-bottom:16px">
+      <div class="chart-title">Distribuci&oacute;n del estado contractual seg&uacute;n a&ntilde;o de inicio &mdash; 2022 a 2026</div>
+      <div style="position:relative;height:290px;width:100%"><canvas id="estado-equipo-canvas"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: ESTADO POR ÁREA -->
+<div class="section">
+  <div class="section-title">Estado Contractual por &Aacute;rea Responsable</div>
+  <div class="section-body">
+    <div class="chart-card" style="height:auto;padding-bottom:16px">
+      <div class="chart-title">Distribuci&oacute;n del estado contractual por cada &aacute;rea de la alcald&iacute;a &mdash; todos los contratos</div>
+      <div style="position:relative;height:400px;width:100%"><canvas id="estado-area-canvas"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: ANÁLISIS DE BRECHA -->
+<div class="section">
+  <div class="section-title">An&aacute;lisis de Brecha</div>
+  <div class="section-body">
+    <div class="brecha-wrap">
+      <div class="brecha-left">
+        <div class="chart-card">
+          <div class="chart-title" id="scatter-title">Diagn&oacute;stico de brecha: tiempo vs avance f&iacute;sico</div>
+          <div style="position:relative;height:280px;width:100%"><canvas id="scatter-canvas"></canvas></div>
+        </div>
+      </div>
+      <div class="brecha-right">
+        <div class="chart-card">
+          <div class="chart-title">Avance F&iacute;sico vs Financiero por Equipo</div>
+          <div style="position:relative;height:280px;width:100%"><canvas id="avance-canvas"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: RESPONSABILIDAD POR EQUIPO -->
+<div class="section">
+  <div class="section-title">Responsabilidad por Equipo</div>
+  <div class="section-body">
+    <div class="equipo-grid" id="equipo-grid"></div>
+  </div>
+</div>
+
+<!-- COLLAPSIBLE TABLE -->
+<button id="btn-toggle-table" onclick="toggleTable()">&#9660; Ver detalle t&eacute;cnico &mdash; 204 contratos</button>
+
+<div id="detail-section">
+  <div class="filter-row">
+    <select id="fil-alerta" onchange="aplicarFiltros()">
+      <option value="">Todas las alertas</option>
+      <option value="vencido">Vencido</option>
+      <option value="urgente">Urgente</option>
+      <option value="judicial">Judicial</option>
+      <option value="normal">Normal</option>
+    </select>
+    <select id="fil-equipo" onchange="aplicarFiltros()">
+      <option value="">Todos los equipos</option>
+    </select>
+    <input id="fil-texto" type="text" placeholder="Buscar num, contratista, equipo…" oninput="aplicarFiltros()" style="flex:1;min-width:160px">
+    <button class="btn-limpiar" onclick="limpiarFiltros()">Limpiar</button>
+    <button class="btn-csv" onclick="exportCSV()">Exportar CSV</button>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th id="th-num" onclick="sortTable('num')">Num</th>
+          <th id="th-tipo" onclick="sortTable('tipo')">Tipo</th>
+          <th id="th-ct" onclick="sortTable('ct')">Contratista</th>
+          <th id="th-eq" onclick="sortTable('eq')">Equipo</th>
+          <th id="th-val" onclick="sortTable('val')">Valor</th>
+          <th id="th-fis" onclick="sortTable('fis')">F&iacute;s%</th>
+          <th id="th-fin" onclick="sortTable('fin')">Fin%</th>
+          <th id="th-brecha" onclick="sortTable('brecha')">Brecha</th>
+          <th id="th-est" onclick="sortTable('est')">Estado</th>
+          <th id="th-dias" onclick="sortTable('dias')">D&iacute;as</th>
+          <th id="th-alerta" onclick="sortTable('alerta')">Alerta</th>
+        </tr>
+      </thead>
+      <tbody id="tbl-body"></tbody>
+    </table>
+  </div>
+  <div id="pagination" class="pagination"></div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div id="modal-box">
+    <button id="modal-close" onclick="closeModal()">&#10005;</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+var SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/14HDW6L9sqkE25Db-B6PaFVKNNbgavWBCSDmHJA6tsc4/export?format=csv&gid=1574774109';
+var EMBEDDED = [{"num":"149957-2025","tipo":"ORDEN DE COMPRA","fecha_inicio":"2025-09-01","fecha_fin":"2026-05-28","ct":"GRAN IMAGEN S.A.S.","val":null,"est":"EN EJECUCION","eq":"TIC","fis":90.0,"fin":90.0,"total_pagado":null,"pagos":[]},{"num":"621-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2023-09-11","fecha_fin":"2024-08-10","ct":"FUNDACION SOCIAL VIVE COLOMBIA","val":null,"est":"LIQUIDADO","eq":"SEGURIDAD","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"626-2023","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2023-09-19","fecha_fin":"2024-11-02","ct":"IMPECOS SAS","val":1800000000.0,"est":"LIQUIDADO","eq":"AMBIENTE","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCB-277-2024","tipo":"CONTRATO DE COMISION","fecha_inicio":"2024-05-09","fecha_fin":"2025-06-23","ct":"AGROBOLSA S.A. COMISIONISTA DE BOLSA","val":37641952.0,"est":"EN LIQUIDACION","eq":"ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCB-759-2025","tipo":"CONTRATO DE COMISION","fecha_inicio":"2025-06-16","fecha_fin":"2026-08-15","ct":"AGROBOLSA S.A. COMISIONISTA DE BOLSA","val":42671044.0,"est":"EN EJECUCION","eq":"ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-1170-2024","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2024-01-01","fecha_fin":"2024-12-31","ct":"HARDWARE ASESORIAS SOFTWARE LTDA 1","val":310534986.0,"est":"TERMINADO","eq":"EDUCACION","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-1187-2025","tipo":"ORDEN DE COMPRA","fecha_inicio":"2025-12-02","fecha_fin":"2026-02-01","ct":"HARDWARE ASESORIAS SOFTWARE LTDA","val":5396000.0,"est":"EN LIQUIDACION","eq":"TIC","fis":1.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-1199-2025","tipo":"ORDEN DE COMPRA","fecha_inicio":"2025-12-19","fecha_fin":"2026-09-18","ct":"GRAN IMAGEN S.A.S.","val":null,"est":"EN EJECUCION","eq":"TIC","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-491-2021","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2021-10-19","fecha_fin":"2023-11-24","ct":"ABOVE SAS","val":59836467.0,"est":"LIQUIDADO","eq":"EDUCACION","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-649-2023","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2024-01-01","fecha_fin":"2024-12-31","ct":"GRUPO EDS AUTOGAS S.A.S","val":null,"est":"EN LIQUIDACION","eq":"ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-824-2022","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2024-11-06","fecha_fin":"2024-12-31","ct":"ABOVE SAS","val":83060095.0,"est":"LIQUIDADO","eq":"EDUCACION","fis":1.0,"fin":2.0,"total_pagado":null,"pagos":[]},{"num":"CIA-418-2021","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2021-06-28","fecha_fin":"2027-06-30","ct":"AGENCIA DISTRITAL PARA LA EDUCACIÓN SUPERIOR, LA CIENCIA Y LA TECNOLOGÍA, ATENEA","val":7920797388.0,"est":"EN EJECUCION","eq":"EDUCACION","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CI-544-2023","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2023-06-20","fecha_fin":"2024-07-19","ct":"CORPORACION PARA EL DESARROLLO DE LAS MI CROEMPRESAS","val":null,"est":"EN LIQUIDACION","eq":"REACTIVACION ECONOMICA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-1134-2024","tipo":"CONTRATOS INTERADMINISTRATIVOS","fecha_inicio":"2025-02-05","fecha_fin":"2026-06-14","ct":"UNIVERSIDAD DISTRITAL FRANCISCO JOSE DE CALDAS","val":2400000000.0,"est":"EN EJECUCION","eq":"PARTICIPACION","fis":85.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-1135-2024","tipo":"CONTRATOS INTERADMINISTRATIVOS","fecha_inicio":"2025-02-10","fecha_fin":"2025-12-09","ct":"UNIVERSIDAD DISTRITAL FRANCISCO JOSE DE CALDAS","val":1150000000.0,"est":"EN LIQUIDACION","eq":"ACUERDOS CIUDADANOS ESPACIO PUBLICO","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-1156-2024","tipo":"CONTRATOS INTERADMINISTRATIVOS","fecha_inicio":"2025-02-24","fecha_fin":"2026-05-23","ct":"UNIVERSIDAD DISTRITAL FRANCISCO JOSE DE CALDAS","val":3710855946.0,"est":"EN EJECUCION","eq":"SALUD","fis":70.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-1160-2024","tipo":"CONTRATOS INTERADMINISTRATIVOS","fecha_inicio":"2025-02-26","fecha_fin":"2025-12-20","ct":"UNIVERSIDAD DISTRITAL FRANCISCO JOSE DE CALDAS","val":1711670240.0,"est":"EN LIQUIDACION","eq":"SEGURIDAD","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-1165-2024","tipo":"CONTRATOS INTERADMINISTRATIVOS","fecha_inicio":"2025-02-10","fecha_fin":"2025-11-09","ct":"CORPORACION COLOMBIA INTERNACIONAL CCI","val":556111303.0,"est":"EN LIQUIDACION","eq":"AMBIENTE","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-129-2013","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2013-11-08","fecha_fin":"2014-09-08","ct":"FONDO DE DESARROLLO LOCAL DE SANTA FE","val":2645632242.0,"est":"EN EJECUCION","eq":"ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-513-2023","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2023-05-02","fecha_fin":"2024-02-01","ct":"UNIVERSIDAD DISTRITAL FRANCISCO JOSE DE CALDAS","val":2566886884.0,"est":"EN LIQUIDACION","eq":"SALUD","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-515-2023","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2023-05-05","fecha_fin":"2024-11-04","ct":"UNIVERSIDAD DISTRITAL FRANCISCO JOSE DE CALDAS","val":4711493763.0,"est":"EN LIQUIDACION","eq":"SALUD","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-527-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS<","fecha_inicio":"2023-05-23","fecha_fin":"2030-12-31","ct":"AGENCIA DISTRITAL PARA LA EDUCACIÓN SUPERIOR, LA CIENCIA Y LA TECNOLOGÍA, ATENEA","val":8181860000.0,"est":"EN EJECUCION","eq":"EDUCACION","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-546-2022","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2022-09-29","fecha_fin":"2024-01-29","ct":"CORPORACION PARA EL DESARROLLO DE LAS MI CROEMPRESAS","val":3559547395.0,"est":"EN LIQUIDACION","eq":"REACTIVACION ECONOMICA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-562-2022","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2022-08-24","fecha_fin":"2029-12-31","ct":"AGENCIA DISTRITAL PARA LA EDUCACIÓN SUPERIOR, LA CIENCIA Y LA TECNOLOGÍA, ATENEA","val":9374373000.0,"est":"EN EJECUCION","eq":"EDUCACION","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-578-2023","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2023-07-17","fecha_fin":"2024-06-15","ct":"UNIVERSIDAD NACIONAL DE COLOMBIA","val":2085428566.0,"est":"EN LIQUIDACION","eq":"PARTICIPACION","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-666-2024","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2024-09-24","fecha_fin":"2031-12-31","ct":"AGENCIA DISTRITAL PARA LA EDUCACIÓN SUPERIOR, LA CIENCIA Y LA TECNOLOGÍA, ATENEA","val":8500000000.0,"est":"EN EJECUCION","eq":"EDUCACION","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-773-2025","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2025-05-20","fecha_fin":"2032-06-30","ct":"AGENCIA DISTRITAL PARA LA EDUCACIÓN SUPERIOR, LA CIENCIA Y LA TECNOLOGÍA, ATENEA","val":14350000000.0,"est":"EN EJECUCION","eq":"EDUCACION","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-804-2025","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2025-07-28","fecha_fin":"2026-07-31","ct":"SECRETARIA DISTRITAL DE CULTURA RECREACION Y DEPORTE","val":2994846457.0,"est":"EN EJECUCION","eq":"CULTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-809-2022","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2023-02-06","fecha_fin":"2024-07-11","ct":"UNIVERSIDAD DISTRITAL FRANCISCO JOSE DE CALDAS","val":838634000.0,"est":"EN LIQUIDACION","eq":"REACTIVACION ECONOMICA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-843-2024","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2025-01-13","fecha_fin":"2025-12-12","ct":"CORPORACION PARA EL DESARROLLO DE LAS MI CROEMPRESAS","val":1739890000.0,"est":"EN LIQUIDACION","eq":"REACTIVACION ECONOMICA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-1235-2025","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2026-03-05","fecha_fin":"2026-07-20","ct":"AHLA SHUGL INTERNATIONAL SAS","val":255648062.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":32.0,"fin":32.0,"total_pagado":null,"pagos":[]},{"num":"CIN-680-2023","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2024-02-09","fecha_fin":"2024-12-26","ct":"PROJEKTA LIMITADA INGENIEROS CONSULTORES","val":306869726.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-833-2022","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2024-02-22","fecha_fin":"2024-09-02","ct":"CONSORCIO INTERVIAL FANDI","val":206067528.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-982-2025","tipo":"CONTRATO DE CONSULTORIA","fecha_inicio":"2025-10-23","fecha_fin":"2026-06-30","ct":"PROJEKTA LIMITADA INGENIEROS CONSULTORES","val":427638544.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":47.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CON-791-2025","tipo":"CONTRATO DE OBRA","fecha_inicio":"2025-07-02","fecha_fin":"2026-07-01","ct":"AHLA SHUGL INTERNATIONAL SAS","val":675000000.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1075-2024","tipo":"","fecha_inicio":"2024-12-11","fecha_fin":"2025-11-10","ct":"CARLOS ALBERTO PINZON MOLINA","val":3403572982.0,"est":"EN LIQUIDACION","eq":"CULTURA","fis":76.02,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1113-2024","tipo":"","fecha_inicio":"2025-02-11","fecha_fin":"2025-12-22","ct":"CARLOS ALBERTO PINZON MOLINA","val":1272179188.0,"est":"EN EJECUCION","eq":"RECREACION Y DEPORTES","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1124-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-02-04","fecha_fin":"2026-05-28","ct":"BOOST BUSINESS CONSULTING S.A.S.","val":4750796000.0,"est":"EN EJECUCION","eq":"REACTIVACION ECONOMICA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1130-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-02-04","fecha_fin":"2026-03-30","ct":"BOOST BUSINESS CONSULTING S.A.S.","val":3807405444.0,"est":"EN EJECUCION","eq":"AMBIENTE - REACTIVACIÓN","fis":99.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1147-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-02-03","fecha_fin":"2025-11-02","ct":"TU SALUD H & G SOCIEDAD POR ACCIONES SIM PLIFICADA S A S","val":1500000000.0,"est":"EN LIQUIDACION","eq":"SALUD","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1150-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-02-05","fecha_fin":"2025-12-04","ct":"FUNDACION SOCIAL VIVE COLOMBIA","val":1999999918.0,"est":"EN LIQUIDACION","eq":"BUEN TRATO","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1158-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-02-14","fecha_fin":"2026-01-29","ct":"CORPORACION COLOMBIA INTERNACIONAL CCI","val":null,"est":"EN LIQUIDACION","eq":"MUJER","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1166-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-02-05","fecha_fin":"2026-03-04","ct":"FUNDACION SOCIAL VIVE COLOMBIA","val":1200000000.0,"est":"EN LIQUIDACION","eq":"PAZ, MEMORIA Y RECONCILIACIÓN","fis":1.0,"fin":1.3,"total_pagado":null,"pagos":[]},{"num":"CPS-1167-2024","tipo":"ORDEN DE COMPRA","fecha_inicio":"2025-01-02","fecha_fin":"2025-09-01","ct":"AUTO INVERSIONES COLOMBIA S.A. AUTOINVER COL","val":60000000.0,"est":"EN LIQUIDACION","eq":"ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1168-2024","tipo":"ORDEN DE COMPRA","fecha_inicio":"2025-01-02","fecha_fin":"2025-09-01","ct":"AUTO INVERSIONES COLOMBIA S.A. AUTOINVER COL","val":40000000.0,"est":"EN LIQUIDACION","eq":"ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1184-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2026-01-29","fecha_fin":"2026-07-28","ct":"VIVACE PRODUCCIONES COLOMBIA S A S","val":482550400.0,"est":"EN EJECUCION","eq":"PARTICIPACION","fis":0.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CPS-1221-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2026-03-17","fecha_fin":"2026-11-16","ct":"DIRECCION Y GESTIÓN DE PROYECTOS SAS","val":1273588050.0,"est":"EN EJECUCION","eq":"PAZ, MEMORIA Y RECONCILIACIÓN","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1231-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2026-02-16","fecha_fin":"2026-12-15","ct":"FUNDACION ECODES","val":3848443684.0,"est":"EN EJECUCION","eq":"MUJER","fis":0.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CPS-1232-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2026-01-29","fecha_fin":"2026-09-28","ct":"VIVACE PRODUCCIONES COLOMBIA S A S","val":640000000.0,"est":"EN EJECUCION","eq":"PARTICIPACION","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-142-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2024-03-27","fecha_fin":"2025-03-26","ct":"SUMIMAS S A S","val":60007703.0,"est":"LIQUIDADO","eq":"TIC","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-219-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2024-04-19","fecha_fin":"2025-09-01","ct":"SUMIMAS S A S","val":null,"est":"LIQUIDADO","eq":"TIC","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-613-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2023-09-12","fecha_fin":"2024-12-25","ct":"VISION & PROYECTOS S.A.S.","val":1528464622.0,"est":"EN LIQUIDACION","eq":"REACTIVACION ECONOMICA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-620-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2023-09-11","fecha_fin":"2024-11-11","ct":"VISION & PROYECTOS S.A.S.","val":2400000000.0,"est":"EN LIQUIDACION","eq":"REACTIVACIÓN ECONOMICA-MUJER","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-629-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2023-10-17","fecha_fin":"2025-05-16","ct":"CONSORCIO AMBIENTAL KENNEDY","val":2546884819.0,"est":"EN LIQUIDACION","eq":"AMBIENTE","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-655-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2024-02-16","fecha_fin":"2025-10-15","ct":"IMPECOS SAS","val":3899691694.0,"est":"EN LIQUIDACION","eq":"AMBIENTE","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-678-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2024-01-18","fecha_fin":"2026-05-17","ct":"AUTOS MONGUI S A S","val":450000000.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-790-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"","fecha_fin":"","ct":"UNION TEMPORAL TRIBECA 714","val":3442474068.0,"est":"EN EJECUCION","eq":"ADMINISTRATIVA","fis":82.12,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-820-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-09-02","fecha_fin":"2026-06-01","ct":"GENERACION DE TALENTOS SAS","val":4695515000.0,"est":"EN EJECUCION","eq":"REACTIVACION ECONOMICA","fis":52.0,"fin":48.0,"total_pagado":null,"pagos":[]},{"num":"CPS-885-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-09-30","fecha_fin":"2026-03-29","ct":"DIRECCION Y GESTIÓN DE PROYECTOS SAS","val":187521000.0,"est":"EN LIQUIDACION","eq":"INNOVACION","fis":100.0,"fin":100.0,"total_pagado":null,"pagos":[]},{"num":"CPS-937-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-12-04","fecha_fin":"2026-04-03","ct":"AUTOS MONGUI S A S","val":50000000.0,"est":"EN EJECUCION","eq":"ADMINISTRATIVA","fis":84.36,"fin":25.0,"total_pagado":null,"pagos":[]},{"num":"CPS-978-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-11-11","fecha_fin":"2026-08-10","ct":"TU SALUD H & G SOCIEDAD POR ACCIONES SIM PLIFICADA S A S","val":2173206000.0,"est":"EN EJECUCION","eq":"SALUD","fis":61.02,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-981-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-12-04","fecha_fin":"2026-08-03","ct":"BOOST BUSINESS CONSULTING S.A.S.","val":1182339039.0,"est":"EN EJECUCION","eq":"REACTIVACION ECONOMICA","fis":40.0,"fin":30.0,"total_pagado":null,"pagos":[]},{"num":"CSE-256-2025","tipo":"CONTRATO DE SEGUROS","fecha_inicio":"2025-03-05","fecha_fin":"2026-04-21","ct":"COMPAÑIA MUNDIAL DE SEGUROS S.A.","val":16650691.0,"est":"LIQUIDADO","eq":"ALMACEN","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CSE-298-2020","tipo":"CONTRATO DE SEGUROS","fecha_inicio":"2021-01-12","fecha_fin":"2022-06-17","ct":"COMPAÑIA MUNDIAL DE SEGUROS S.A.","val":14731941.0,"est":"LIQUIDADO","eq":"ALMACEN","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CSE-611-2023","tipo":"CONTRATO DE SEGUROS","fecha_inicio":"2023-08-01","fecha_fin":"2024-10-27","ct":"PREVISORA S.A COMPAÑÍA DE SEGUROS","val":262444879.0,"est":"EN LIQUIDACION","eq":"ALMACEN","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CSE-694-2024","tipo":"CONTRATO DE SEGUROS","fecha_inicio":"2024-10-28","fecha_fin":"2026-04-21","ct":"LA PREVISORA S A","val":650352013.0,"est":"EN LIQUIDACION","eq":"ALMACEN","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CSU-001-2024","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2024-06-24","fecha_fin":"2025-06-30","ct":"FENIX MEDIA GROUP SAS","val":42000000.0,"est":"EN LIQUIDACION","eq":"COMUNICACIONES","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CSU-1099-2024","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2024-12-17","fecha_fin":"2025-12-16","ct":"COMERCIALIZADORA ELECTROCON SAS","val":65372963.0,"est":"EN LIQUIDACION","eq":"ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CSU-1152-2024","tipo":"ORDEN DE COMPRA","fecha_inicio":"2024-01-02","fecha_fin":"2026-09-01","ct":"GRUPO EDS AUTOGAS S.A.S","val":120000000.0,"est":"EN EJECUCION","eq":"ADMINISTRATIVA","fis":84.68,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CSU-624-2023","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2023-08-25","fecha_fin":"2024-07-31","ct":"COMERCIALIZADORA ELECTROCON SAS","val":78300000.0,"est":"EN LIQUIDACION","eq":"ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CSU-939-2025","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2025-10-27","fecha_fin":"2026-04-26","ct":"FERRETERIA FORERO S A","val":320000000.0,"est":"EN LIQUIDACION","eq":"CULTURA","fis":null,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CSU-955-2025","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2025-10-21","fecha_fin":"2026-07-20","ct":"FERRETERIA FORERO S A","val":3750412000.0,"est":"EN EJECUCION","eq":"EDUCACION","fis":0.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"FDLK-CIA-802-2022","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2022-11-29","fecha_fin":"2023-12-31","ct":"UNIVERSIDAD NACIONAL DE COLOMBIA","val":1517634924.0,"est":"EN LIQUIDACION","eq":"PARTICIPACION","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"FDLK-CIN-833-2022","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2024-02-22","fecha_fin":"2024-09-02","ct":"CONSORCIO INTERVIAL FANDI","val":206067528.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"631-2023","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2024-01-01","fecha_fin":"2024-12-31","ct":"DISTRIBUIDORA NISSAN S.A.","val":null,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"657-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2024-02-09","fecha_fin":"2025-04-08","ct":"UNION TEMPORAL KENNEDY GR","val":null,"est":"LIQUIDADO","eq":"AMBIENTE","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"800-2022","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2022-12-01","fecha_fin":"2023-12-31","ct":"AMERICANA CORP S A S","val":null,"est":"LIQUIDADO","eq":"SALUD","fis":86.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCU-687-2023","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2024-02-05","fecha_fin":"2025-04-30","ct":"ENEL COLOMBIA SA ESP","val":329300587.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-1078-2025","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2025-12-22","fecha_fin":"2026-03-10","ct":"INVERSIONES AIRPOT TECH FP S.A.S","val":38052868.0,"est":"EN LIQUIDACION","eq":"SEGURIDAD","fis":100.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CCV-1151-2024","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2025-02-03","fecha_fin":"2025-12-30","ct":"COMERCIALIZADORA SERLE.COM SAS","val":2959771805.0,"est":"EN LIQUIDACION","eq":"EDUCACION","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-1169-2024","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2024-01-01","fecha_fin":"2024-12-31","ct":"SISTETRONICS SAS","val":179968035.0,"est":"TERMINADO","eq":"EDUCACION","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-1186-2025","tipo":"ORDEN DE COMPRA","fecha_inicio":"2025-12-02","fecha_fin":"2026-02-01","ct":"ALUICA CONSTRUCCIONES SAS","val":null,"est":"EN LIQUIDACION","eq":"TIC","fis":1.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-266-2024","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2024-05-07","fecha_fin":"2024-12-31","ct":"UNION TEMPORAL MOTORYSA - CASATORO 2020","val":null,"est":"EN LIQUIDACION","eq":"DESPACHO-ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-298-2019","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"","fecha_fin":"","ct":"CAPROSUM SAS","val":45068000.0,"est":"NO REPORTAN","eq":"","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-340-2020","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2020-12-02","fecha_fin":"2023-11-15","ct":"ORGANIZACION TERPEL S A","val":168750000.0,"est":"EN LIQUIDACION","eq":"ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-644-2023","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2023-11-03","fecha_fin":"2024-04-22","ct":"C.I.A MIGUEL CABALLERO SAS","val":null,"est":"LIQUIDADO","eq":"SEGURIDAD","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-646-2023","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2023-11-01","fecha_fin":"2024-07-28","ct":"COLOMBIA CONSTRUCCIONES Y DISEÑOS SAS","val":1200000000.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-836-2026","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2026-04-13","fecha_fin":"2026-05-10","ct":"DATASER-VICIOS & COMUNI-CACIONES SAS","val":49026691.0,"est":"EN EJECUCION","eq":"TIC","fis":1.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-969-2025","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2025-10-21","fecha_fin":"2025-12-29","ct":"OPEN FOR DRESSMAKING SAS","val":85191531.0,"est":"EN LIQUIDACION","eq":"COMUNICACIONES","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CCV-979-2025","tipo":"ORDEN DE COMPRA","fecha_inicio":"2025-10-21","fecha_fin":"2026-01-20","ct":"PANAMERICANA OUTSOURCING S A","val":null,"est":"EN LIQUIDACION","eq":"TIC","fis":100.0,"fin":100.0,"total_pagado":null,"pagos":[]},{"num":"CCV-998-2025","tipo":"CONTRATO DE COMPRAVENTA","fecha_inicio":"2025-11-12","fecha_fin":"2026-06-11","ct":"SUPERMOTOS MYM COLOMBIA S.A.S.","val":2058504840.0,"est":"EN EJECUCION","eq":"SEGURIDAD","fis":0.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CIA -535-2023","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2023-07-10","fecha_fin":"2024-05-09","ct":"INSTITUTO DISTRITAL PARA LA PROTECCION DE LA NIÑEZ Y LA JUVENTUD","val":null,"est":"EN LIQUIDACION","eq":"SEGURIDAD","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-1146-2024","tipo":"CONTRATOS INTERADMINISTRATIVOS","fecha_inicio":"2024-01-01","fecha_fin":"2024-12-31","ct":"UNIVERSIDAD COLEGIO MAYOR DE CUNDINAMARC A","val":null,"est":"EN LIQUIDACION","eq":"REACTIVACION ECONOMICA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-1159-2024","tipo":"CONTRATOS INTERADMINISTRATIVOS","fecha_inicio":"2025-01-09","fecha_fin":"2026-07-08","ct":"SERVICIOS POSTALES NACIONALES S.A.S.","val":5000000.0,"est":"EN EJECUCION","eq":"CDI","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-807-2025","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2025-07-31","fecha_fin":"2025-12-31","ct":"UNIDAD ADMINISTRATIVA ESPECIAL DE REHABILITACIÓN Y MANTENIMIENTO VIAL","val":4276732038.0,"est":"NO REPORTAN","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIA-827-2025","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"SECRETARIA DISTRITAL DE INTEGRACION SOCIAL","val":29990566000.0,"est":"NO REPORTAN","eq":"SUBSIDIO TIPO C (IMG)","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-1161-2024","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2025-02-03","fecha_fin":"2025-09-02","ct":"LOGIA 3 ASOCIADOS SAS","val":526819426.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-1222-2025","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2026-02-24","fecha_fin":"2026-06-30","ct":"J A M INGENIERIA Y MEDIO AMBIENTE S.A.S","val":232092801.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":21.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CIN-1225-2025","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2025-01-01","fecha_fin":"2026-06-18","ct":"CONSULTORIA ESTRUCTURAL Y DE CONSTRUCCIO N S A S","val":226259628.0,"est":"FIRMADO","eq":"INFRAESTRUCTURA","fis":0.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CIN-1236-2025","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2026-03-04","fecha_fin":"2026-09-03","ct":"CONSTRUCTORA GILLI S.A.S","val":186916935.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":23.38,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-316-2019","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2019-12-16","fecha_fin":"2021-12-17","ct":"CONSORCIO MEDUSA K","val":3090610116.0,"est":"TERMINADO","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-585-2024","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2024-09-13","fecha_fin":"2026-02-10","ct":"CONSORCIO INTER URBANO K","val":4099444441.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-647-2023","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2024-01-29","fecha_fin":"2025-05-03","ct":"CONSORCIO INTER-PARK","val":711437323.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-661-2023","tipo":"CONTRATO DE CONSULTORIA","fecha_inicio":"2024-01-23","fecha_fin":"2024-07-22","ct":"CONSORCIO KENNEDY 004","val":300000000.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-662-2023","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2024-02-01","fecha_fin":"2025-04-05","ct":"CONSORCIO CORREDOR VIAL URBANO PCL","val":2203814963.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-664-2023","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2024-02-01","fecha_fin":"2025-11-23","ct":"CONSORCIO CON KENNEDY 39","val":167034855.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA/PARTICIPACION","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-683-2023","tipo":"CONTRATOS INTERADMINISTRATIVOS","fecha_inicio":"2024-02-28","fecha_fin":"2025-07-30","ct":"NOGAALL SAS","val":365557902.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA/PARTICIPACION","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-717-2022","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2022-10-05","fecha_fin":"2024-04-30","ct":"CONSORCIO SCLV","val":5529930002.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-798-2025","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2025-07-21","fecha_fin":"2026-05-30","ct":"CB INGENIEROS S.A.S","val":190513901.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-906-2025","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2025-11-10","fecha_fin":"2026-05-09","ct":"CONSORCIO KENNEDY CG 2025","val":275149727.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CIN-994-2025","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2025-12-15","fecha_fin":"2026-12-31","ct":"CONSULTORES DONOVAN S.A.S","val":1964588620.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CON-1203-2025","tipo":"CONTRATO DE CONSULTORIA","fecha_inicio":"","fecha_fin":"","ct":"BAZZANI GROUP S.A.S. BIC","val":730093782.0,"est":"FIRMADO","eq":"INFRAESTRUCTURA","fis":0.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CON-831-2022","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2023-02-15","fecha_fin":"2024-10-15","ct":"GEICOL SAS","val":1934101490.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":60.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CON-927-2025","tipo":"CONTRATO DE CONSULTORIA","fecha_inicio":"2026-01-18","fecha_fin":"2026-05-31","ct":"PC INTERVENTORES S.A.S","val":1078854169.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":47.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CON-993-2025","tipo":"CONTRATO DE CONSULTORIA","fecha_inicio":"2026-02-24","fecha_fin":"2026-08-23","ct":"ESTUDIO TERRITORIO SAS","val":629818832.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":20.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"COP-1148-2024","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2025-02-03","fecha_fin":"2025-09-02","ct":"CONSORCIO PARQUES KD E&E 2024","val":2851556145.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":1.0,"fin":1.9,"total_pagado":null,"pagos":[]},{"num":"COP-1157-2024","tipo":"CONTRATO DE OBRA","fecha_inicio":"2024-03-03","fecha_fin":"2025-11-13","ct":"CONSORCIO EDIFICAR","val":349410228.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-1234-2025","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2026-03-04","fecha_fin":"2026-09-03","ct":"2F CONSTRUCCIONES SAS","val":1370724191.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":23.38,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-1239-2025","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2026-03-05","fecha_fin":"2026-07-20","ct":"PETRA INGENIERIA Y CONSTRUCCIONES SAS","val":1799716492.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":32.0,"fin":32.0,"total_pagado":null,"pagos":[]},{"num":"COP-234-2015","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2015-12-30","fecha_fin":"2016-06-30","ct":"I0 INGENIERIA LTDA EN REORGANIZACION","val":540258086.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-314-2019","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2019-11-27","fecha_fin":"2021-12-17","ct":"CONSULTORIA Y CONSTRUCCION S.A.S.","val":12217870620.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-355-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2024-06-12","fecha_fin":"2024-10-27","ct":"SERVINOVAS S A S","val":44486200.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-586-2024","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2024-09-13","fecha_fin":"2026-02-10","ct":"CONSORCIO CONKENNEDY VIAL","val":20801769540.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-587-2024","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2024-09-13","fecha_fin":"2025-12-12","ct":"CONSORCIO KA VIAL","val":20615801187.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-621-2022","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2022-10-05","fecha_fin":"2024-04-30","ct":"XIE S.A.","val":21047175114.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-633-2023","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2024-01-29","fecha_fin":"2025-05-03","ct":"CONSORCIO PARQUES ICOD","val":6616348404.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-643-2023","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2024-02-01","fecha_fin":"2025-04-05","ct":"CONSORCIO CONSERVACION JH","val":16165124761.0,"est":"LIQUIDADO","eq":"INFRAESTRUCTURA","fis":1.0,"fin":2.0,"total_pagado":null,"pagos":[]},{"num":"COP-658-2023","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2024-02-09","fecha_fin":"2024-12-26","ct":"CONSORCIO EMAUS","val":785965349.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-663-2023","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2024-02-01","fecha_fin":"2025-11-23","ct":"CONSORCIO MABRIL 90 2023","val":770000000.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-667-2023","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2024-02-09","fecha_fin":"2025-08-09","ct":"L&C OBRAS Y SERVICIOS SAS","val":200000000.0,"est":"EN LIQUIDACION","eq":"POLICIVO","fis":89.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-690-2022","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2022-10-05","fecha_fin":"2024-04-30","ct":"CONSORCIO VIAS DE KENNEDY 22","val":21039435784.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-815-2022","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2023-02-22","fecha_fin":"2024-09-02","ct":"PAVIMENTOS TECNICOS S.A.S","val":596652016.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":50.0,"fin":65.0,"total_pagado":null,"pagos":[]},{"num":"COP-816-2025","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2025-11-10","fecha_fin":"2026-05-09","ct":"CONSORCIO PRO K","val":3583922940.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":91.8,"fin":null,"total_pagado":null,"pagos":[]},{"num":"COP-938-2025","tipo":"CONTRATO DE OBRA PUBLICA","fecha_inicio":"2025-12-15","fecha_fin":"2027-02-14","ct":"CONSORCIO VIAL KENNEDY 2025","val":19645886208.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":33.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS- 818-2022","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2023-03-09","fecha_fin":"2024-09-24","ct":"UNION TEMPORAL INGEIKALA","val":690459622.0,"est":"EN PROCESO JUDICIAL","eq":"ACUERDOS CIUDADANOS ESPACIO PUBLICO","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1001-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2026-03-02","fecha_fin":"2026-12-01","ct":"UT ALUNA","val":2535280000.0,"est":"EN EJECUCION","eq":"SEGURIDAD","fis":11.08,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1079-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-01-07","fecha_fin":"2025-06-06","ct":"GERENCIA PUBLICA Y PRIVADA SAS","val":226497496.0,"est":"EN LIQUIDACION","eq":"ALMACEN","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1101-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2024-12-26","fecha_fin":"2026-06-23","ct":"INTERLIFT S.A.S.","val":28024500.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1128-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-02-05","fecha_fin":"2025-09-04","ct":"UNIÓN TEMPORAL BIENESTAR KENNEDY","val":1300000000.0,"est":"EN LIQUIDACION","eq":"AMBIENTE","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1133-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-02-17","fecha_fin":"2026-04-16","ct":"UNION TEMPORAL CONEXION LOCAL KENNEDY","val":2620855500.0,"est":"TERMINADO","eq":"PARTICIPACION","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1149-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-02-05","fecha_fin":"2025-10-04","ct":"IMPULSAR FUNDACION SOCIAL","val":580661683.0,"est":"EN LIQUIDACION","eq":"AMBIENTE","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1163-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-01-04","fecha_fin":"2025-06-23","ct":"UNION TEMPORAL ASEO COLOMBIA AM P4","val":250722408.0,"est":"EN LIQUIDACION","eq":"ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-1233-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2026-03-02","fecha_fin":"2026-11-01","ct":"CONSORCIO KENNEDY PROCEDA 2025","val":2000116000.0,"est":"EN EJECUCION","eq":"AMBIENTE","fis":0.28,"fin":0.0134,"total_pagado":null,"pagos":[]},{"num":"CPS-1238-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS PROFESIONALES","fecha_inicio":"2026-02-10","fecha_fin":"2026-08-09","ct":"ORFA-ORGANIZACION DE LA COMUNIDAD RAIZAL CON RESIDENCIA FUERA DEL ARCHIPIELAGO DE SAN ANDRES, PROVIDENCIA Y SANTA CATALINA","val":184013000.0,"est":"EN EJECUCION","eq":"PARTICIPACION","fis":40.0,"fin":40.0,"total_pagado":null,"pagos":[]},{"num":"CPS-156-2024","tipo":"ORDEN DE COMPRA","fecha_inicio":"2025-02-24","fecha_fin":"2026-05-23","ct":"UNION TEMPORAL OUTSOURCING GIAF","val":371425263.0,"est":"EN LIQUIDACION","eq":"ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-165-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2024-04-08","fecha_fin":"2025-12-22","ct":"SGI DE COLOMBIA S.A.S","val":600000000.0,"est":"EN LIQUIDACION","eq":"PARTICIPACION","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-364-2022","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2022-08-22","fecha_fin":"2025-01-30","ct":"BONGA BUSTAMANTE S.A.S.","val":427950000.0,"est":"EN LIQUIDACION","eq":"ACUERDOS CIUDADANOS ESPACIO PUBLICO","fis":80.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-365-2020","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2021-01-21","fecha_fin":"2023-12-30","ct":"UNION TEMPORAL MANTENIMIENTO AUTOMOTOR","val":510000000.0,"est":"LIQUIDADO","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-415-2024","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2024-05-30","fecha_fin":"2024-12-31","ct":"UNION TEMPORAL KENTUKY","val":2628250788.0,"est":"EN LIQUIDACION","eq":"ADMINISTRATIVA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-495-2021","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2021-10-19","fecha_fin":"2022-09-18","ct":"CORPORACION ESTRATEGICA EN GESTION E INT EGRACION COLOMBIA CUYA_SIGLA SERA EGESCO","val":2168434600.0,"est":"LIQUIDADO","eq":"BUEN TRATO","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-608-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2023-09-01","fecha_fin":"2024-12-14","ct":"G&D GERENCIA Y DIRECCION DE PROYECTOS S. A.S","val":1275000000.0,"est":"PROCESO SANCIONATORIO","eq":"ACUERDOS CIUDADANOS ESPACIO PUBLICO","fis":27.0,"fin":40.0,"total_pagado":null,"pagos":[]},{"num":"CPS-612-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2023-09-11","fecha_fin":"2025-06-30","ct":"UT BDG - DKM 2023","val":3708702532.0,"est":"EN LIQUIDACION","eq":"REACTIVACION ECONOMICA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-625-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2023-09-01","fecha_fin":"2024-05-15","ct":"FUNDACION CONSTRUCCION LOCAL","val":551978413.0,"est":"EN LIQUIDACION","eq":"SUBSIDIO TIPO C - IMG","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-627-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2023-09-25","fecha_fin":"2024-11-30","ct":"UNION TEMPORAL PAZ Y RECONCILIACIÓN","val":1100000000.0,"est":"EN LIQUIDACION","eq":"PAZ, MEMORIA Y RECONCILIACIÓN","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-645-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2023-11-28","fecha_fin":"2024-12-02","ct":"ASCODES S.A.S.","val":1927696390.0,"est":"LIQUIDADO","eq":"CULTURA/MUJER","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-651-2023","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2023-11-02","fecha_fin":"2024-01-02","ct":"COMPUSERTEC INGENIERIA SAS","val":35674446.0,"est":"EN LIQUIDACION","eq":"CULTURA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-794-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"","fecha_fin":"","ct":"CONSORCIO KIOS","val":312548002.0,"est":"EN EJECUCION","eq":"ADMINISTRATIVA","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-800-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-09-12","fecha_fin":"2026-06-11","ct":"CONSORCIO PYBA KENNEDY 2025-2","val":2734095316.0,"est":"EN EJECUCION","eq":"AMBIENTE","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-808-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-08-05","fecha_fin":"2026-08-04","ct":"TECNISERVICIOS JG SAS","val":44788807.0,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":57.0,"fin":86.0,"total_pagado":null,"pagos":[]},{"num":"CPS-812-2022","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2023-02-20","fecha_fin":"2023-08-19","ct":"RFID TECNOLOGIA SAS","val":267000000.0,"est":"NO REPORTAN","eq":"SEGURIDAD","fis":0.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CPS-814-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-09-09","fecha_fin":"2026-07-08","ct":"UNION TEMPORAL PROYECTOS DGP","val":2115835000.0,"est":"EN EJECUCION","eq":"SALUD","fis":60.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-815-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-09-09","fecha_fin":"2026-07-08","ct":"CONSORCIO POR LA SALUD DE KENNEDY 2025.","val":4316724000.0,"est":"EN EJECUCION","eq":"SALUD","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-819-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-09-15","fecha_fin":"2026-06-14","ct":"CORPORACION NACIONAL PARA EL DESARROLLO SOSTENIBLE","val":1048401000.0,"est":"EN EJECUCION","eq":"AMBIENTE","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-838-2026","tipo":"PRESTACION DE SERVICIOS","fecha_inicio":"2026-04-07","fecha_fin":"2027-02-23","ct":"UNIÓN TEMPORAL CLEAN COLOMBIA 5G","val":581176716.0,"est":"EN EJECUCION","eq":"ADMINISTRATIVA","fis":12.13,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-870-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-09-15","fecha_fin":"2026-05-14","ct":"I T SOLUCIONES Y SERVICIOS LTDA","val":203095846.0,"est":"EN LIQUIDACION","eq":"TIC","fis":1.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-898-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-10-10","fecha_fin":"2026-06-09","ct":"CONSORCIO RIESGO 2025","val":1500165000.0,"est":"EN EJECUCION","eq":"AMBIENTE","fis":90.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-905-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-10-02","fecha_fin":"2025-12-01","ct":"METROLOGICAL CENTER SAS","val":3749000.0,"est":"EN LIQUIDACION","eq":"KENNEDY A LA MEDIDA","fis":100.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CPS-928-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-11-12","fecha_fin":"2026-09-11","ct":"CONSORCIO BUENTRATO KENNEDY 2025","val":1878956000.0,"est":"EN EJECUCION","eq":"MUJER","fis":0.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CPS-934-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-10-29","fecha_fin":"2026-05-28","ct":"ASOCIACION PARA LA INCLUSION SOCIAL DE L OS GRUPOS AFROCOLOMBIANOS","val":458559600.0,"est":"EN EJECUCION","eq":"PARTICIPACION","fis":0.0,"fin":40.0,"total_pagado":null,"pagos":[]},{"num":"CPS-960-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-12-30","fecha_fin":"2026-10-29","ct":"UNION TEMPORAL ESPACIO PUBLICO KENNEDY","val":2722799000.0,"est":"EN EJECUCION","eq":"ACUERDOS CIUDADANOS ESPACIO PUBLICO","fis":20.0,"fin":20.0,"total_pagado":null,"pagos":[]},{"num":"CPS-977-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2026-03-03","fecha_fin":"2026-12-02","ct":"ALIMENTOS INTEGRALES DE COLOMBIA SAS","val":2785504092.0,"est":"EN EJECUCION","eq":"MUJER","fis":23.0,"fin":11.0,"total_pagado":null,"pagos":[]},{"num":"CPS-983-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-11-25","fecha_fin":"2026-08-24","ct":"ASOCIACION COORDINADORA CIVICA NACIONAL - COORDINA","val":2291500000.0,"est":"EN EJECUCION","eq":"SEGURIDAD","fis":28.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-995-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-11-11","fecha_fin":"2026-07-10","ct":"FUNDACION PARA EL DESARROLLO SOCIOCULTURAL, DEPORTIVO Y COMUNITARIO AGROPECUARIO Y/O AMBIENTAL FUNDESCO","val":2892403544.0,"est":"EN EJECUCION","eq":"CULTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CPS-996-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-12-22","fecha_fin":"2026-10-21","ct":"CONSORCIO PARTICIPACIÓN KENNEDY 2025","val":5795681000.0,"est":"EN EJECUCION","eq":"PARTICIPACION","fis":13.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CPS-997-2025","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2025-12-17","fecha_fin":"2026-11-14","ct":"CONSORCIO DEPORTE KENNEDY FJ 2025","val":4266478000.0,"est":"EN EJECUCION","eq":"RECREACION Y DEPORTES","fis":15.0,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"CSE-837-2026","tipo":"CONTRATO DE SEGUROS","fecha_inicio":"2026-04-21","fecha_fin":"2027-10-20","ct":"ASEGURADORA SOLIDARIA DE COLOMBIA ENTIDAD COOPERATIVA","val":660376960.0,"est":"EN EJECUCION","eq":"ALMACEN","fis":0.018,"fin":1.0,"total_pagado":null,"pagos":[]},{"num":"CSU-1164-2024","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2024-01-01","fecha_fin":"2024-12-31","ct":"UNION TEMPORAL ESTUDIOS 049","val":null,"est":"EN EJECUCION","eq":"INFRAESTRUCTURA","fis":40.0,"fin":72.0,"total_pagado":null,"pagos":[]},{"num":"CSU-617-2023","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2023-10-17","fecha_fin":"2024-10-22","ct":"INTEGRA DE COLOMBIA SAS","val":54123927.0,"est":"EN LIQUIDACION","eq":"CULTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CSU-632-2023","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2023-10-26","fecha_fin":"2024-12-31","ct":"GRUPO LOS LAGOS S.A.S","val":117500000.0,"est":"LIQUIDADO","eq":"ALMACEN","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CSU-821-2025","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2025-08-26","fecha_fin":"2026-05-25","ct":"GN GENERACION DE NEGOCIOS SAS","val":115000000.0,"est":"EN EJECUCION","eq":"ALMACEN- DESPACHO","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CSU-860-2025","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2025-09-08","fecha_fin":"2025-12-07","ct":"DIESAM EVENTOS Y LOGISTICA SAS","val":6958772.0,"est":"EN LIQUIDACION","eq":"ADMINISTRATIVA - SST","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"CSU-887-2025","tipo":"CONTRATO DE SUMINISTRO","fecha_inicio":"2025-10-01","fecha_fin":"2026-09-30","ct":"CENTRO FERRETERO MAFER S A S","val":64057500.0,"est":"EN EJECUCION","eq":"ADMINISTRATIVA","fis":null,"fin":0.0,"total_pagado":null,"pagos":[]},{"num":"FDLK- CIN -350-2022","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2022-07-05","fecha_fin":"2024-08-28","ct":"CONSORCIO INGEKENNEDY","val":93271774.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"FDLK-CIA-556-2023","tipo":"CONVENIO INTERADMINISTRATIVO","fecha_inicio":"2023-07-21","fecha_fin":"2024-09-20","ct":"UNIVERSIDAD DISTRITAL FRANCISCO JOSE DE CALDAS","val":2255063520.0,"est":"EN LIQUIDACION","eq":"BUEN TRATO/MUJER","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"FDLK-CIN-832-2022","tipo":"CONTRATO DE INTERVENTORIA","fecha_inicio":"2023-02-15","fecha_fin":"2024-10-15","ct":"CONSORCIO GMC - GRUPO METRO DE COLOMBIA","val":329679394.0,"est":"EN LIQUIDACION","eq":"INFRAESTRUCTURA","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"FDLK-CPS- 457-2022","tipo":"CONTRATO DE PRESTACION DE SERVICIOS","fecha_inicio":"2022-09-02","fecha_fin":"2023-11-21","ct":"CONSORCIO KENNEDY PRODUCTIVA","val":941983000.0,"est":"LIQUIDADO","eq":"PAZ, MEMORIA Y RECONCILIACIÓN","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"1153-2024","tipo":"","fecha_inicio":"2024-12-27","fecha_fin":"2024-12-31","ct":"C.I.A MIGUEL CABALLERO SAS","val":null,"est":"","eq":"SEGURIDAD","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"1162-2024","tipo":"","fecha_inicio":"2025-01-18","fecha_fin":"2025-12-31","ct":"EPIA S.A.S","val":null,"est":"","eq":"SEGURIDAD","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"825-2022","tipo":"","fecha_inicio":"2025-01-18","fecha_fin":"2025-12-31","ct":"ABOVE SAS","val":null,"est":"","eq":"EDUCACION","fis":null,"fin":null,"total_pagado":null,"pagos":[]},{"num":"682-2023","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"","val":null,"est":"","eq":"PARTICIPACION","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"681-2023","tipo":"","fecha_inicio":"2024-01-01","fecha_fin":"2024-12-31","ct":"COMERCIALIZADORA SERLE.COM SAS","val":null,"est":"","eq":"","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"1723-2023","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"SECRETARIA DISTRITAL DE SEGURIDAD","val":null,"est":"","eq":"","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"777-2022","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"C.I.A. MIGUEL CABALLERO S.A.S","val":null,"est":"","eq":"","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"421-2021","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"Secretaría de Cultultura - Idartes - Fondos de Desarrollo Local","val":null,"est":"","eq":"","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"810-2025","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"ACINPRO","val":null,"est":"","eq":"","fis":56.94,"fin":null,"total_pagado":null,"pagos":[]},{"num":"157822-","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"Gran Imagen S.A.S.","val":null,"est":"","eq":"","fis":55.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"444-","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"AGENCIA NACIONAL INMOBILIARIA VIRGILIO BARCO","val":null,"est":"","eq":"","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"443-","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"AGENCIA NACIONAL INMOBILIARIA VIRGILIO BARCO","val":null,"est":"","eq":"","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"529-2021","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"AGENCIA NACIONAL INMOBILIARIA VIRGILIO BARCO","val":null,"est":"","eq":"","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"402-2022","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"Secretaría de Cultura - Idartes","val":null,"est":"","eq":"","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"384-","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"AGENCIA NACIONAL INMOBILIARIA VIRGILIO BARCO","val":null,"est":"","eq":"","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"126444-","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"SUMIMAS S.A.S.","val":null,"est":"","eq":"","fis":100.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"1011-","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"Interlift SAS","val":null,"est":"","eq":"","fis":90.0,"fin":null,"total_pagado":null,"pagos":[]},{"num":"679-","tipo":"","fecha_inicio":"","fecha_fin":"","ct":"Secretaría de Cultura - Idartes - Fondos de Desarrollo Local","val":null,"est":"","eq":"","fis":80.0,"fin":null,"total_pagado":null,"pagos":[]}];
+var DATA = [];
+var FILTRADOS = [];
+var PAGE = 1;
+var PER_PAGE = 25;
+var SORT_KEY = null;
+var SORT_DIR = 1;
+var TABLE_OPEN = false;
+var scatterChart = null;
+var avanceChart = null;
+var estadoDonutChart = null;
+var estadoEqChart = null;
+var estadoAreaChart = null;
+
+(function init() {
+  DATA = enrich(EMBEDDED);
+  FILTRADOS = DATA.slice();
+  renderPage();
+  hideLoader();
+  tryFetchSheets();
+})();
+
+function renderPage() {
+  var kpis = computeKPIs(DATA);
+  updateHero(kpis);
+  try { renderPortfolioStrip(DATA); } catch(e) { console.warn('strip:',e); }
+  try { renderEstadoTiles(DATA); } catch(e) { console.warn('tiles:',e); }
+  try { renderEstadoDonut(DATA); } catch(e) { console.warn('donut:',e); }
+  try { renderEstadoEquipo(DATA); } catch(e) { console.warn('estadoAnio:',e); }
+  try { renderEstadoArea(DATA); } catch(e) { console.warn('estadoArea:',e); }
+  try { renderScatter(DATA); } catch(e) { console.warn('scatter:',e); }
+  try { renderAvanceEquipo(DATA); } catch(e) { console.warn('avance:',e); }
+  renderEquipoCards(DATA);
+  renderTabla();
+}
+
+function hideLoader() {
+  var el = document.getElementById('loader');
+  if (el) { el.style.opacity = '0'; setTimeout(function(){ el.style.display = 'none'; }, 400); }
+}
+
+function parseDate(s) {
+  if (!s) return null;
+  var p = s.split('-');
+  if (p.length < 3) return null;
+  var d = new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function enrich(arr) {
+  var hoy = new Date(2026, 5, 25); // June 25 2026
+  return arr.map(function(c) {
+    var dias = null;
+    if (c.fecha_fin) {
+      var ff = parseDate(c.fecha_fin);
+      if (ff) dias = Math.round((ff - hoy) / 86400000);
+    }
+    var est = (c.est || '').toUpperCase();
+    var alerta = 'normal';
+    if (dias !== null && dias < 0) alerta = 'vencido';
+    else if (dias !== null && dias <= 30) alerta = 'urgente';
+    if (est.indexOf('JUDICI') >= 0) alerta = 'judicial';
+    var pctTiempo = null;
+    if (c.fecha_inicio && c.fecha_fin) {
+      var fi = parseDate(c.fecha_inicio), ff2 = parseDate(c.fecha_fin);
+      if (fi && ff2) {
+        var total = ff2 - fi;
+        if (total > 0) pctTiempo = Math.min(100, Math.max(0, (hoy - fi) / total * 100));
+      }
+    }
+    var brecha = null;
+    if (pctTiempo !== null && c.fis !== null && c.fis !== undefined) {
+      brecha = Math.round(pctTiempo - c.fis);
+    }
+    var anio = c.fecha_inicio ? c.fecha_inicio.substring(0,4) : null;
+    return Object.assign({}, c, {dias:dias, alerta:alerta, pctTiempo:pctTiempo, brecha:brecha, anio:anio});
+  });
+}
+
+function computeKPIs(data) {
+  var n = data.length || 1;
+  var totalVal   = data.reduce(function(a,c){return a+(c.val||0);},0);
+  var totalPagado= data.reduce(function(a,c){return a+(c.total_pagado||0);},0);
+
+  // Estados clave
+  var enLiq  = data.filter(function(c){ return (c.est||'').indexOf('LIQUIDAC')!==-1; });
+  var enEjec = data.filter(function(c){ return (c.est||'').indexOf('EJECUC')!==-1; });
+  var sinInfo= data.filter(function(c){ var e=(c.est||'').trim(); return !e||e===''||e==='SIN INFO'; });
+  var procLeg= data.filter(function(c){ return (c.est||'').indexOf('JUDICIAL')!==-1||(c.est||'').indexOf('SANC')!==-1; });
+  var cerrados= data.filter(function(c){ return c.est==='LIQUIDADO'||c.est==='TERMINADO'; });
+
+  // Contratos 2022 que siguen abiertos (no cerrados, no sin info): riesgo histórico
+  var hist2022 = data.filter(function(c){
+    return c.anio===2022 && c.est!=='LIQUIDADO' && c.est!=='TERMINADO';
+  });
+  // Área con mayor concentración en liquidación
+  var liqPorArea={};
+  enLiq.forEach(function(c){ var e=c.eq||'Sin equipo'; liqPorArea[e]=(liqPorArea[e]||0)+1; });
+  var areaTopLiq='–', areaTopLiqN=0;
+  Object.keys(liqPorArea).forEach(function(k){ if(liqPorArea[k]>areaTopLiqN){areaTopLiqN=liqPorArea[k];areaTopLiq=k;} });
+  // Abreviar nombre de área si es muy largo
+  if(areaTopLiq.length>18) areaTopLiq=areaTopLiq.substring(0,16)+'…';
+
+  // Para brecha scatter (mantener compatibilidad)
+  var withBrecha = data.filter(function(c){ return c.brecha !== null; });
+  var avgBrecha = withBrecha.length ? withBrecha.reduce(function(a,c){return a+c.brecha;},0)/withBrecha.length : 0;
+  var vencidos  = data.filter(function(c){ return c.alerta==='vencido'; });
+  var d30 = data.filter(function(c){ return c.dias!==null && c.dias>=0 && c.dias<=30; });
+  var d60 = data.filter(function(c){ return c.dias!==null && c.dias>30 && c.dias<=60; });
+  var d90 = data.filter(function(c){ return c.dias!==null && c.dias>60 && c.dias<=90; });
+  var valVenc = vencidos.reduce(function(a,c){return a+(c.val||0);},0);
+
+  return {n:n, totalVal:totalVal, totalPagado:totalPagado,
+    enLiq:enLiq, enEjec:enEjec, sinInfo:sinInfo, procLeg:procLeg, cerrados:cerrados,
+    hist2022:hist2022, areaTopLiq:areaTopLiq, areaTopLiqN:areaTopLiqN,
+    // compatibilidad scatter/avance
+    avgBrecha:avgBrecha, vencidos:vencidos, d30:d30, d60:d60, d90:d90, valVenc:valVenc};
+}
+
+function fmt(val) {
+  if (!val) return '$0';
+  var b = val/1e9;
+  if (b >= 1) return '$' + b.toFixed(1) + 'B';
+  var m = val/1e6;
+  return '$' + m.toFixed(0) + 'M';
+}
+
+function svgGauge(score) {
+  var color = score > 65 ? '#EF5350' : score > 35 ? '#FFA726' : '#00A878';
+  var label = score > 65 ? 'ALTO' : score > 35 ? 'MEDIO' : 'BAJO';
+  var w = 160, h = 95, cx = 80, cy = 82, r = 60;
+  var startAngle = Math.PI;
+  var endAngle = Math.PI + (score/100) * Math.PI;
+  var sx = cx + r * Math.cos(startAngle);
+  var sy = cy + r * Math.sin(startAngle);
+  var ex = cx + r * Math.cos(endAngle);
+  var ey = cy + r * Math.sin(endAngle);
+  var nx = cx + (r*0.55) * Math.cos(endAngle);
+  var ny = cy + (r*0.55) * Math.sin(endAngle);
+  var sweep = score > 0 ? 1 : 0;
+  var bgPath = 'M '+(cx-r)+' '+cy+' A '+r+' '+r+' 0 0 1 '+(cx+r)+' '+cy;
+  var fgPath = 'M '+sx.toFixed(1)+' '+sy.toFixed(1)+' A '+r+' '+r+' 0 '+(score>50?'1':'0')+' 1 '+ex.toFixed(1)+' '+ey.toFixed(1);
+  var svg = '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">';
+  svg += '<path d="'+bgPath+'" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="10" stroke-linecap="round"/>';
+  if (score > 0) {
+    svg += '<path d="'+fgPath+'" fill="none" stroke="'+color+'" stroke-width="10" stroke-linecap="round"/>';
+  }
+  svg += '<line x1="'+cx+'" y1="'+cy+'" x2="'+nx.toFixed(1)+'" y2="'+ny.toFixed(1)+'" stroke="white" stroke-width="2.5" stroke-linecap="round"/>';
+  svg += '<circle cx="'+cx+'" cy="'+cy+'" r="5" fill="white" opacity=".8"/>';
+  svg += '<text x="'+cx+'" y="'+(cy-18)+'" text-anchor="middle" font-size="18" font-weight="800" fill="'+color+'">'+score+'</text>';
+  svg += '</svg>';
+  return svg;
+}
+
+function svgRing(pct, color, size) {
+  size = size || 70;
+  var r = size * 0.36;
+  var circ = 2 * Math.PI * r;
+  var fill = (pct/100) * circ;
+  var cx = size/2, cy = size/2;
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" xmlns="http://www.w3.org/2000/svg">'
+    + '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="'+(size*0.1)+'"/>'
+    + '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+(size*0.1)+'"'
+    + ' stroke-dasharray="'+fill.toFixed(1)+' '+circ.toFixed(1)+'" stroke-dashoffset="'+(circ/4).toFixed(1)+'"'
+    + ' stroke-linecap="round" transform="rotate(-90 '+cx+' '+cy+')" />'
+    + '<text x="'+cx+'" y="'+(cy+1)+'" text-anchor="middle" dominant-baseline="middle"'
+    + ' font-size="'+(size*0.19)+'" font-weight="800" fill="'+color+'">'
+    + Math.round(pct)+'%</text></svg>';
+}
+
+function updateHero(kpis) {
+  var n = kpis.n;
+  var pctLiq  = ((kpis.enLiq.length/n)*100).toFixed(0);
+  var pctEjec = ((kpis.enEjec.length/n)*100).toFixed(0);
+  var pctCerr = ((kpis.cerrados.length/n)*100).toFixed(0);
+  var pctPag  = kpis.totalVal > 0 ? ((kpis.totalPagado/kpis.totalVal)*100).toFixed(1) : '0.0';
+
+  // KPI 1 — Portafolio total
+  document.getElementById('hero-val-total').textContent = fmt(kpis.totalVal);
+  document.getElementById('hero-sub-total').textContent = n + ' contratos · FDL Kennedy';
+
+  // KPI 2 — En Liquidación
+  document.getElementById('hero-val-liq').textContent = kpis.enLiq.length + ' contratos';
+  document.getElementById('hero-sub-liq').textContent = pctLiq + '% del portafolio';
+
+  // KPI 3 — Histórico 2022 sin cerrar (alerta roja)
+  var h = kpis.hist2022.length;
+  document.getElementById('hero-val-hist').textContent = h + (h===1?' contrato':' contratos');
+  document.getElementById('hero-sub-hist').textContent = h > 0 ? '2022 aún sin liquidar' : 'Ninguno pendiente ✓';
+  if (h > 0) document.getElementById('hero-kpi-hist').style.borderTopColor = '#EF5350';
+
+  // KPI 4 — En Ejecución
+  document.getElementById('hero-val-ejec').textContent = kpis.enEjec.length + ' contratos';
+  document.getElementById('hero-sub-ejec').textContent = pctEjec + '% · activos actualmente';
+
+  // KPI 5 — Área con más liquidaciones
+  document.getElementById('hero-val-area').textContent = kpis.areaTopLiq;
+  document.getElementById('hero-sub-area').textContent = kpis.areaTopLiqN + ' contratos en liquidación';
+}
+
+function renderEstadoTiles(data) {
+  var el = document.getElementById('estado-tiles');
+  if (!el) return;
+  var n = data.length;
+  var STATES = [
+    {k:'EN EJECUCION',        label:'En Ejecución',    color:'#1565C0'},
+    {k:'EN LIQUIDACION',      label:'En Liquidación',  color:'#E65100'},
+    {k:'LIQUIDADO',           label:'Liquidado',        color:'#2E7D32'},
+    {k:'FIRMADO',             label:'Firmado',          color:'#0288D1'},
+    {k:'TERMINADO',           label:'Terminado',        color:'#7B1FA2'},
+    {k:'NO REPORTAN',         label:'No Reportan',      color:'#C62828'},
+    {k:'EN PROCESO JUDICIAL', label:'Proc. Judicial',   color:'#AD1457'},
+    {k:'SIN INFO',            label:'Sin Información',  color:'#546E7A'}
+  ];
+  var map = {};
+  STATES.forEach(function(s){ map[s.k]={count:0,val:0}; });
+  data.forEach(function(c) {
+    var k = (c.est||'').trim().toUpperCase();
+    if (k==='PROCESO SANCIONATORIO') k='EN PROCESO JUDICIAL';
+    if (!map[k]) k='SIN INFO';
+    map[k].count++;
+    map[k].val += (c.val||0);
+  });
+  el.innerHTML = STATES.filter(function(s){return map[s.k].count>0;}).map(function(s){
+    var d = map[s.k];
+    var pct = Math.round(d.count/n*100);
+    var vStr = (d.val/1e9).toFixed(1);
+    return '<div class="est-tile" style="border-top-color:'+s.color+'">' +
+      '<div class="est-tile-lbl" style="color:'+s.color+'">'+s.label+'</div>' +
+      '<div class="est-tile-num">'+d.count+'</div>' +
+      '<div class="est-tile-sub">'+pct+'% del portafolio</div>' +
+      '<div class="est-tile-val">$'+vStr+'B comprometidos</div>' +
+      '<div class="est-tile-bar"><div style="height:100%;width:'+pct+'%;background:'+s.color+';border-radius:2px"></div></div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderPortfolioStrip(data) {
+  var el = document.getElementById('portfolio-strip');
+  if (!el) return;
+  var n = data.length;
+  var STATES = [
+    {k:'EN EJECUCION',        color:'#1565C0', label:'En Ejecución'},
+    {k:'EN LIQUIDACION',      color:'#E65100', label:'En Liquidación'},
+    {k:'LIQUIDADO',           color:'#2E7D32', label:'Liquidado'},
+    {k:'FIRMADO',             color:'#0288D1', label:'Firmado'},
+    {k:'TERMINADO',           color:'#7B1FA2', label:'Terminado'},
+    {k:'NO REPORTAN',         color:'#C62828', label:'No Reportan'},
+    {k:'EN PROCESO JUDICIAL', color:'#AD1457', label:'Proc. Judicial'},
+    {k:'SIN INFO',            color:'#546E7A', label:'Sin Info'}
+  ];
+  var map = {};
+  STATES.forEach(function(s){ map[s.k]=0; });
+  data.forEach(function(c) {
+    var k = (c.est||'').trim().toUpperCase();
+    if (k==='PROCESO SANCIONATORIO') k='EN PROCESO JUDICIAL';
+    if (map[k]===undefined) k='SIN INFO';
+    map[k]++;
+  });
+  el.innerHTML = STATES.filter(function(s){return map[s.k]>0;}).map(function(s){
+    var pct = (map[s.k]/n*100).toFixed(1);
+    return '<div class="strip-seg" style="flex:'+map[s.k]+';background:'+s.color+'" title="'+s.label+': '+map[s.k]+' contratos ('+pct+'%)">' +
+      '<span>'+s.label+' '+map[s.k]+'</span>' +
+    '</div>';
+  }).join('');
+}
+
+function filtrarDonut(year) {
+  var btns = document.querySelectorAll('.df-btn');
+  for (var i=0; i<btns.length; i++) {
+    btns[i].classList.toggle('df-active', btns[i].getAttribute('data-year')===year);
+  }
+  var filtered = year==='todos' ? DATA : DATA.filter(function(c){
+    return c.fecha_inicio && c.fecha_inicio.substring(0,4)===year;
+  });
+  renderEstadoDonut(filtered);
+}
+
+function renderEstadoDonut(data) {
+  var ctx = document.getElementById('estado-donut-canvas');
+  if (!ctx) return;
+  if (estadoDonutChart) { estadoDonutChart.destroy(); estadoDonutChart = null; }
+  var STATES = [
+    {k:'EN EJECUCION',        label:'En Ejecución',    color:'#1565C0'},
+    {k:'EN LIQUIDACION',      label:'En Liquidación',  color:'#E65100'},
+    {k:'LIQUIDADO',           label:'Liquidado',        color:'#2E7D32'},
+    {k:'FIRMADO',             label:'Firmado',          color:'#0288D1'},
+    {k:'TERMINADO',           label:'Terminado',        color:'#7B1FA2'},
+    {k:'NO REPORTAN',         label:'No Reportan',      color:'#C62828'},
+    {k:'EN PROCESO JUDICIAL', label:'Proc. Judicial',   color:'#AD1457'},
+    {k:'SIN INFO',            label:'Sin Información',  color:'#546E7A'}
+  ];
+  var map = {};
+  STATES.forEach(function(s){ map[s.k]=0; });
+  var n = data.length;
+  data.forEach(function(c) {
+    var k = (c.est||'').trim().toUpperCase();
+    if (k==='PROCESO SANCIONATORIO') k='EN PROCESO JUDICIAL';
+    if (map[k]===undefined) k='SIN INFO';
+    map[k]++;
+  });
+  var active = STATES.filter(function(s){ return map[s.k]>0; });
+  estadoDonutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: active.map(function(s){ return s.label; }),
+      datasets: [{
+        data: active.map(function(s){ return map[s.k]; }),
+        backgroundColor: active.map(function(s){ return s.color; }),
+        borderWidth: 3,
+        borderColor: '#f4f6fa',
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(item) {
+              var pct = n>0 ? Math.round(item.parsed/n*100) : 0;
+              return ' ' + item.label + ': ' + item.parsed + ' contratos (' + pct + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
+  var leg = document.getElementById('donut-legend');
+  if (leg) {
+    leg.innerHTML = active.map(function(s) {
+      var pct = n>0 ? Math.round(map[s.k]/n*100) : 0;
+      return '<div class="dl-item">' +
+        '<div class="dl-dot" style="background:'+s.color+'"></div>' +
+        '<span class="dl-label">'+s.label+'</span>' +
+        '<span class="dl-count">'+map[s.k]+'</span>' +
+        '<span class="dl-pct">('+pct+'%)</span>' +
+      '</div>';
+    }).join('');
+  }
+}
+
+function renderEstadoArea(data) {
+  var ctx = document.getElementById('estado-area-canvas');
+  if (!ctx) return;
+  if (estadoAreaChart) { estadoAreaChart.destroy(); estadoAreaChart = null; }
+
+  // Build area map, group small areas (<=3 contracts) into "Otros"
+  var eqRaw = {};
+  data.forEach(function(c) {
+    var eq = (c.eq||'Sin área').trim();
+    if (!eqRaw[eq]) eqRaw[eq] = {total:0, states:{}};
+    eqRaw[eq].total++;
+    var k = (c.est||'').trim().toUpperCase();
+    eqRaw[eq].states[k] = (eqRaw[eq].states[k]||0)+1;
+  });
+
+  var eqMap = {};
+  Object.keys(eqRaw).forEach(function(eq) {
+    var target = eqRaw[eq].total <= 3 ? 'Otros' : eq;
+    if (!eqMap[target]) eqMap[target] = {};
+    Object.keys(eqRaw[eq].states).forEach(function(k) {
+      eqMap[target][k] = (eqMap[target][k]||0) + eqRaw[eq].states[k];
+    });
+  });
+
+  var eqNames = Object.keys(eqMap).filter(function(e){return e!=='Otros';}).sort(function(a,b){
+    var ta=Object.values(eqMap[a]).reduce(function(x,y){return x+y;},0);
+    var tb=Object.values(eqMap[b]).reduce(function(x,y){return x+y;},0);
+    return tb-ta;
+  });
+  if (eqMap['Otros']) eqNames.push('Otros');
+
+  var stateKeys   = ['EN EJECUCION','EN LIQUIDACION','LIQUIDADO','FIRMADO','TERMINADO','NO REPORTAN','EN PROCESO JUDICIAL','PROCESO SANCIONATORIO',''];
+  var stateColors = ['#1565C0','#E65100','#2E7D32','#0288D1','#7B1FA2','#C62828','#AD1457','#880E4F','#546E7A'];
+  var stateLabels = ['En Ejecución','En Liquidación','Liquidado','Firmado','Terminado','No Reportan','Proc. Judicial','Proc. Sancionatorio','Sin Info'];
+
+  var activeStates = stateKeys.filter(function(k) {
+    return eqNames.some(function(eq){ return (eqMap[eq][k]||0)>0; });
+  });
+
+  function shortEq(eq) {
+    if (eq === 'Otros') return 'Otros';
+    var w = eq.split(/\s+/);
+    return w.length > 2 ? w.slice(0,2).join(' ')+'…' : eq;
+  }
+
+  estadoAreaChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: eqNames.map(shortEq),
+      datasets: activeStates.map(function(k) {
+        var i = stateKeys.indexOf(k);
+        return {
+          label: stateLabels[i],
+          data: eqNames.map(function(eq){ return eqMap[eq][k]||0; }),
+          backgroundColor: stateColors[i],
+          stack: 's'
+        };
+      })
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display:false },
+        tooltip: {
+          callbacks: {
+            title: function(items) {
+              return eqNames[items[0].dataIndex];
+            },
+            label: function(item) {
+              if (!item.parsed.x) return null;
+              var tot = activeStates.reduce(function(a,k,si){
+                return a+(item.chart.data.datasets[si].data[item.dataIndex]||0);},0);
+              var pct = tot>0?Math.round(item.parsed.x/tot*100):0;
+              return item.dataset.label+': '+item.parsed.x+' ('+pct+'%)';
+            }
+          }
+        }
+      },
+      scales: {
+        x: { stacked:true, ticks:{font:{size:9}}, grid:{color:'rgba(0,0,0,.06)'} },
+        y: { stacked:true, ticks:{font:{size:9,weight:'600'},color:'#223'}, grid:{display:false} }
+      }
+    }
+  });
+}
+
+function renderEstadoEquipo(data) {
+  var ctx = document.getElementById('estado-equipo-canvas');
+  if (!ctx) return;
+  if (estadoEqChart) { estadoEqChart.destroy(); estadoEqChart = null; }
+
+  // Stacked bar: AÑOS × ESTADO (real)
+  var years = ['2022','2023','2024','2025','2026'];
+  var stateKeys = ['EN EJECUCION','EN LIQUIDACION','LIQUIDADO','FIRMADO','TERMINADO','NO REPORTAN','EN PROCESO JUDICIAL','PROCESO SANCIONATORIO',''];
+  var stateColors = ['#1565C0','#E65100','#2E7D32','#0288D1','#7B1FA2','#C62828','#AD1457','#880E4F','#546E7A'];
+  var stateLabels = ['En Ejecución','En Liquidación','Liquidado','Firmado','Terminado','No Reportan','Proc. Judicial','Proc. Sancionatorio','Sin Info'];
+
+  // Matrix [year][state] = count
+  var matrix = {};
+  years.forEach(function(y){ matrix[y] = {}; stateKeys.forEach(function(k){ matrix[y][k]=0; }); });
+
+  data.forEach(function(c) {
+    var yr = c.fecha_inicio ? c.fecha_inicio.substring(0,4) : null;
+    if (!yr || years.indexOf(yr)<0) return;
+    var k = (c.est||'').trim().toUpperCase();
+    if (matrix[yr][k]===undefined) matrix[yr][k]=0;
+    matrix[yr][k]++;
+  });
+
+  // Only include states that have data
+  var activeStates = stateKeys.filter(function(k,i) {
+    return years.some(function(y){ return matrix[y][k]>0; });
+  });
+
+  estadoEqChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: years,
+      datasets: activeStates.map(function(k) {
+        var i = stateKeys.indexOf(k);
+        return {
+          label: stateLabels[i],
+          data: years.map(function(y){ return matrix[y][k]||0; }),
+          backgroundColor: stateColors[i],
+          stack: 's',
+          borderRadius: 0
+        };
+      })
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position:'bottom', labels:{font:{size:9}, boxWidth:10, padding:6} },
+        tooltip: {
+          callbacks: {
+            title: function(items) { return 'Año ' + items[0].label; },
+            label: function(item) {
+              var tot = activeStates.reduce(function(a,k,si){
+                return a + (item.chart.data.datasets[si].data[item.dataIndex]||0);
+              },0);
+              var pct = tot>0 ? Math.round(item.parsed.y/tot*100) : 0;
+              return item.dataset.label + ': ' + item.parsed.y + ' (' + pct + '%)';
+            }
+          }
+        }
+      },
+      scales: {
+        x: { stacked:true, ticks:{font:{size:11,weight:'700'},color:'#112'}, grid:{display:false} },
+        y: { stacked:true, ticks:{font:{size:9}}, grid:{color:'rgba(0,0,0,.06)'}, title:{display:true,text:'N° contratos',font:{size:9}} }
+      }
+    }
+  });
+}
+
+function renderScatter(data) {
+  var ctx = document.getElementById('scatter-canvas');
+  if (!ctx) return;
+  if (scatterChart) { scatterChart.destroy(); scatterChart = null; }
+
+  var pts = data.filter(function(c){ return c.pctTiempo !== null && c.fis !== null && c.fis !== undefined; });
+  var red=[], amber=[], green=[], labels=[];
+
+  pts.forEach(function(c) {
+    var pt = {x: Math.round(c.pctTiempo), y: c.fis, num: c.num, brecha: c.brecha||0};
+    var b = c.brecha || 0;
+    if (b > 20) red.push(pt);
+    else if (b > 5) amber.push(pt);
+    else green.push(pt);
+  });
+
+  var critCount = red.length;
+  document.getElementById('scatter-title').textContent =
+    'Diagnóstico de brecha: tiempo vs avance físico — ' + critCount + ' contratos con brecha crítica (>20 pts)';
+
+  scatterChart = new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        { label: 'Ritmo ideal', data: [{x:0,y:0},{x:100,y:100}], type:'line',
+          borderColor:'rgba(255,214,0,.6)', borderDash:[6,4], borderWidth:1.5,
+          pointRadius:0, fill:false, tension:0 },
+        { label: 'Crítico (>20 pts)', data: red, backgroundColor:'rgba(198,40,40,.7)',
+          pointRadius:4, pointHoverRadius:6 },
+        { label: 'Moderado (5-20 pts)', data: amber, backgroundColor:'rgba(245,127,23,.7)',
+          pointRadius:3, pointHoverRadius:5 },
+        { label: 'En ritmo (≤5 pts)', data: green, backgroundColor:'rgba(0,168,120,.7)',
+          pointRadius:3, pointHoverRadius:5 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position:'bottom', labels:{font:{size:10}, boxWidth:10, padding:8} },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var d = ctx.raw;
+              if (!d.num) return 'Ritmo ideal';
+              return d.num + ' | brecha: ' + d.brecha + ' pts | T:' + d.x + '% F:' + d.y + '%';
+            }
+          }
+        }
+      },
+      scales: {
+        x: { min:0, max:100, title:{display:true, text:'% Tiempo transcurrido', font:{size:10}},
+             ticks:{font:{size:9}} },
+        y: { min:0, max:100, title:{display:true, text:'Avance físico %', font:{size:10}},
+             ticks:{font:{size:9}} }
+      }
+    }
+  });
+}
+
+function renderAvanceEquipo(data) {
+  var ctx = document.getElementById('avance-canvas');
+  if (!ctx) return;
+  if (avanceChart) { avanceChart.destroy(); avanceChart = null; }
+
+  var eqMap = {};
+  data.forEach(function(c) {
+    var eq = c.eq || 'SIN EQUIPO';
+    if (!eqMap[eq]) eqMap[eq] = {val:0,fisList:[],finList:[]};
+    eqMap[eq].val += c.val || 0;
+    if (c.fis !== null && c.fis !== undefined) eqMap[eq].fisList.push(c.fis);
+    if (c.fin !== null && c.fin !== undefined) eqMap[eq].finList.push(c.fin);
+  });
+
+  var eqs = Object.keys(eqMap)
+    .filter(function(k){ return eqMap[k].fisList.length > 0; })
+    .sort(function(a,b){ return eqMap[b].val - eqMap[a].val; })
+    .slice(0,7);
+
+  var labels = eqs.map(function(e){ return e.length > 18 ? e.substring(0,18)+'…' : e; });
+  var fisData = eqs.map(function(e){
+    var l = eqMap[e].fisList;
+    return l.length ? Math.round(l.reduce(function(a,b){return a+b;},0)/l.length) : 0;
+  });
+  var finData = eqs.map(function(e){
+    var l = eqMap[e].finList;
+    return l.length ? Math.round(l.reduce(function(a,b){return a+b;},0)/l.length) : 0;
+  });
+
+  avanceChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'Avance Físico', data: fisData, backgroundColor: 'rgba(21,101,192,.75)',
+          borderRadius: 4, borderSkipped: false },
+        { label: 'Avance Financiero', data: finData, backgroundColor: 'rgba(245,127,23,.75)',
+          borderRadius: 4, borderSkipped: false }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position:'bottom', labels:{font:{size:10}, boxWidth:10, padding:8} },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.x + '%'; }
+          }
+        }
+      },
+      scales: {
+        x: { min:0, max:100, ticks:{font:{size:9}, callback:function(v){return v+'%'}},
+             title:{display:true,text:'Avance %',font:{size:10}} },
+        y: { ticks:{font:{size:9}} }
+      }
+    }
+  });
+}
+
+function renderEquipoCards(data) {
+  var eqMap = {};
+  data.forEach(function(c) {
+    var eq = c.eq || 'SIN EQUIPO';
+    if (!eqMap[eq]) eqMap[eq] = {n:0,venc:0,val:0,fisList:[]};
+    eqMap[eq].n++;
+    eqMap[eq].val += c.val || 0;
+    if (c.alerta==='vencido') eqMap[eq].venc++;
+    if (c.fis !== null && c.fis !== undefined) eqMap[eq].fisList.push(c.fis);
+  });
+
+  var eqs = Object.keys(eqMap).sort(function(a,b){ return eqMap[b].val - eqMap[a].val; });
+  var html = '';
+  eqs.forEach(function(eq) {
+    var s = eqMap[eq];
+    var pctVenc = s.n ? Math.round(s.venc/s.n*100) : 0;
+    var avgFis = s.fisList.length ? Math.round(s.fisList.reduce(function(a,b){return a+b;},0)/s.fisList.length) : 0;
+    var riskCls = pctVenc > 50 ? 'risk-high' : pctVenc > 20 ? 'risk-mid' : 'risk-low';
+    var barCls = pctVenc > 50 ? 'red' : pctVenc > 20 ? 'amber' : 'green';
+    var ringColor = pctVenc > 50 ? '#C62828' : pctVenc > 20 ? '#F57F17' : '#00A878';
+    var ringSize = 54;
+    html += '<div class="eq-card '+riskCls+'">'
+      + '<div class="eq-name" title="'+eq+'">'+eq+'</div>'
+      + '<div class="eq-body">'
+      + svgRingSmall(avgFis, ringColor, ringSize)
+      + '<div class="eq-stats">'
+      + '<div class="eq-count">'+s.n+' contratos · '+s.venc+' vencidos</div>'
+      + '<div class="eq-val">'+fmt(s.val)+'</div>'
+      + '</div></div>'
+      + '<div class="eq-bar-wrap">'
+      + '<div class="eq-bar-label"><span>Vencidos</span><span>'+pctVenc+'%</span></div>'
+      + '<div class="eq-bar-bg"><div class="eq-bar-fill '+barCls+'" style="width:'+pctVenc+'%"></div></div>'
+      + '</div></div>';
+  });
+  document.getElementById('equipo-grid').innerHTML = html;
+}
+
+function svgRingSmall(pct, color, size) {
+  size = size || 54;
+  var r = size * 0.36;
+  var circ = 2 * Math.PI * r;
+  var fill = (pct/100) * circ;
+  var cx = size/2, cy = size/2;
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">'
+    + '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#e0e8f0" stroke-width="'+(size*0.1)+'"/>'
+    + '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+(size*0.1)+'"'
+    + ' stroke-dasharray="'+fill.toFixed(1)+' '+circ.toFixed(1)+'" stroke-dashoffset="'+(circ/4).toFixed(1)+'"'
+    + ' stroke-linecap="round" transform="rotate(-90 '+cx+' '+cy+')" />'
+    + '<text x="'+cx+'" y="'+(cy+1)+'" text-anchor="middle" dominant-baseline="middle"'
+    + ' font-size="'+(size*0.2)+'" font-weight="800" fill="'+color+'">'
+    + Math.round(pct)+'%</text></svg>';
+}
+
+function renderTabla() {
+  var start = (PAGE-1)*PER_PAGE;
+  var slice = FILTRADOS.slice(start, start+PER_PAGE);
+  var total = FILTRADOS.length;
+  var tbody = document.getElementById('tbl-body');
+  if (!tbody) return;
+
+  var html = '';
+  slice.forEach(function(c) {
+    var rowCls = c.alerta==='vencido' ? 'row-vencido' : c.alerta==='urgente' ? 'row-urgente' : '';
+    var badgeCls = 'badge-'+c.alerta;
+    var fisV = c.fis !== null && c.fis !== undefined ? c.fis.toFixed(0)+'%' : '–';
+    var finV = c.fin !== null && c.fin !== undefined ? c.fin.toFixed(0)+'%' : '–';
+    var brechaV = c.brecha !== null ? c.brecha+'pts' : '–';
+    var diasV = c.dias !== null ? (c.dias < 0 ? Math.abs(c.dias)+'d venc' : c.dias+'d') : '–';
+    var valV = c.val ? fmt(c.val) : '–';
+    var fisBar = c.fis !== null && c.fis !== undefined
+      ? '<div class="fis-bar"><div class="fis-bar-fill" style="width:'+c.fis+'%"></div></div>'
+      : '';
+    var safeC = JSON.stringify(c).replace(/</g,'\\u003c').replace(/'/g,"\\'");
+    html += '<tr class="'+rowCls+'" onclick="openModal('+safeC+')" style="cursor:pointer">'
+      + '<td class="num-col">'+c.num+'</td>'
+      + '<td>'+( c.tipo||'').substring(0,12)+'</td>'
+      + '<td title="'+(c.ct||'')+'">'+(c.ct||'').substring(0,18)+'</td>'
+      + '<td>'+(c.eq||'').substring(0,16)+'</td>'
+      + '<td class="val-col">'+valV+'</td>'
+      + '<td>'+fisV+' '+fisBar+'</td>'
+      + '<td>'+finV+'</td>'
+      + '<td style="font-weight:700;color:'+(c.brecha>20?'#C62828':c.brecha>5?'#F57F17':'#00A878')+'">'+brechaV+'</td>'
+      + '<td>'+(c.est||'').substring(0,14)+'</td>'
+      + '<td>'+diasV+'</td>'
+      + '<td><span class="badge '+badgeCls+'">'+c.alerta+'</span></td>'
+      + '</tr>';
+  });
+  tbody.innerHTML = html;
+
+  // Pagination
+  var pages = Math.ceil(total/PER_PAGE);
+  var pgHtml = '<span class="pg-info">'+total+' contratos</span>';
+  pgHtml += '<button class="pg-btn" onclick="goPage('+Math.max(1,PAGE-1)+')">‹</button>';
+  var start2 = Math.max(1, PAGE-2), end2 = Math.min(pages, PAGE+2);
+  for (var i=start2; i<=end2; i++) {
+    pgHtml += '<button class="pg-btn'+(i===PAGE?' active':'')+'" onclick="goPage('+i+')">'+i+'</button>';
+  }
+  pgHtml += '<button class="pg-btn" onclick="goPage('+Math.min(pages,PAGE+1)+')">›</button>';
+  document.getElementById('pagination').innerHTML = pgHtml;
+}
+
+function goPage(p) { PAGE = p; renderTabla(); }
+
+function sortTable(key) {
+  if (SORT_KEY === key) SORT_DIR *= -1; else { SORT_KEY = key; SORT_DIR = 1; }
+  FILTRADOS.sort(function(a,b) {
+    var av = a[key], bv = b[key];
+    if (av === null || av === undefined) av = SORT_DIR > 0 ? Infinity : -Infinity;
+    if (bv === null || bv === undefined) bv = SORT_DIR > 0 ? Infinity : -Infinity;
+    if (typeof av === 'string') return av.localeCompare(bv) * SORT_DIR;
+    return (av - bv) * SORT_DIR;
+  });
+  PAGE = 1;
+  document.querySelectorAll('thead th').forEach(function(th){ th.classList.remove('sort-asc','sort-desc'); });
+  var th = document.getElementById('th-'+key);
+  if (th) th.classList.add(SORT_DIR > 0 ? 'sort-asc' : 'sort-desc');
+  renderTabla();
+}
+
+function aplicarFiltros() {
+  var alerta = document.getElementById('fil-alerta').value;
+  var equipo = document.getElementById('fil-equipo').value;
+  var texto = (document.getElementById('fil-texto').value||'').toLowerCase();
+  FILTRADOS = DATA.filter(function(c) {
+    if (alerta && c.alerta !== alerta) return false;
+    if (equipo && (c.eq||'') !== equipo) return false;
+    if (texto && !(c.num||'').toLowerCase().includes(texto) &&
+                 !(c.ct||'').toLowerCase().includes(texto) &&
+                 !(c.eq||'').toLowerCase().includes(texto)) return false;
+    return true;
+  });
+  PAGE = 1;
+  renderTabla();
+}
+
+function limpiarFiltros() {
+  document.getElementById('fil-alerta').value = '';
+  document.getElementById('fil-equipo').value = '';
+  document.getElementById('fil-texto').value = '';
+  FILTRADOS = DATA.slice();
+  PAGE = 1;
+  renderTabla();
+}
+
+function exportCSV() {
+  var cols = ['num','tipo','ct','eq','val','fis','fin','brecha','est','dias','alerta'];
+  var rows = [cols.join(',')];
+  FILTRADOS.forEach(function(c) {
+    rows.push(cols.map(function(k){ var v=c[k]; return v===null||v===undefined?'':'"'+String(v).replace(/"/g,'""')+'"'; }).join(','));
+  });
+  var blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href=url; a.download='contratos_fdl_kennedy.csv'; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+
+function toggleTable() {
+  TABLE_OPEN = !TABLE_OPEN;
+  var el = document.getElementById('detail-section');
+  var btn = document.getElementById('btn-toggle-table');
+  if (TABLE_OPEN) {
+    el.style.display = 'block';
+    btn.textContent = '▲ Ocultar detalle técnico';
+    renderTabla();
+  } else {
+    el.style.display = 'none';
+    btn.textContent = '▼ Ver detalle técnico — 204 contratos';
+  }
+}
+
+function openModal(c) {
+  var box = document.getElementById('modal-content');
+  var fisV = c.fis !== null && c.fis !== undefined ? c.fis+'%' : '–';
+  var finV = c.fin !== null && c.fin !== undefined ? c.fin+'%' : '–';
+  var bV = c.brecha !== null && c.brecha !== undefined ? c.brecha+' pts' : '–';
+  var dV = c.dias !== null ? (c.dias < 0 ? Math.abs(c.dias)+' días VENCIDO' : c.dias+' días restantes') : '–';
+  var items = [
+    ['Número', c.num],['Tipo', c.tipo||'–'],['Contratista', c.ct||'–'],['Equipo', c.eq||'–'],
+    ['Valor', fmt(c.val)],['Estado', c.est||'–'],['Fecha Inicio', c.fecha_inicio||'–'],
+    ['Fecha Fin', c.fecha_fin||'–'],['Avance Físico', fisV],['Avance Financiero', finV],
+    ['Brecha', bV],['Tiempo', dV],['Alerta', c.alerta]
+  ];
+  box.innerHTML = '<h2>'+c.num+'</h2><div class="modal-grid">'
+    + items.map(function(i){ return '<div class="mg-item"><div class="mg-label">'+i[0]+'</div><div class="mg-val">'+i[1]+'</div></div>'; }).join('')
+    + '</div>';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+function buildEquipoOptions() {
+  var eqs = [];
+  DATA.forEach(function(c){ if(c.eq && !eqs.includes(c.eq)) eqs.push(c.eq); });
+  eqs.sort();
+  var sel = document.getElementById('fil-equipo');
+  if (!sel) return;
+  eqs.forEach(function(eq) {
+    var opt = document.createElement('option'); opt.value=eq; opt.textContent=eq; sel.appendChild(opt);
+  });
+}
+
+function tryFetchSheets() {
+  if (!SHEET_CSV_URL || SHEET_CSV_URL.indexOf('docs.google.com') === -1) return;
+  // Solo funciona en https:// — en file:// el navegador bloquea fetch externo
+  if (window.location.protocol !== 'https:') return;
+  var pill = document.getElementById('source-pill');
+
+  // Mapa de columnas del Google Sheets (índice 0-base)
+  // Cols K(10),L(11),M(12),R(17),AR(43),AS(44),AT(45) son internas — ignoradas
+  var COL = {NUM:0, TIPO:5, FI:6, FF:7, CT:18, VAL:29, EST:30, EQ:38, FIS:47, FIN:48, PAG:96};
+
+  // Parser CSV completo: respeta saltos de línea dentro de celdas entre comillas
+  function parseFullCSV(text) {
+    var rows=[], row=[], cur='', inQ=false;
+    for (var i=0; i<text.length; i++) {
+      var c = text[i];
+      if (c==='"') {
+        if (inQ && text[i+1]==='"') { cur+='"'; i++; } // comilla escapada ""
+        else { inQ=!inQ; }
+      } else if (c===',' && !inQ) {
+        row.push(cur); cur='';
+      } else if ((c==='\n'||c==='\r') && !inQ) {
+        if (c==='\r' && text[i+1]==='\n') i++; // CRLF
+        row.push(cur); cur='';
+        if (row.join('').trim()) rows.push(row); // ignorar filas totalmente vacías
+        row=[];
+      } else {
+        cur+=c;
+      }
+    }
+    row.push(cur);
+    if (row.join('').trim()) rows.push(row);
+    return rows;
+  }
+  function safeNum(v) {
+    var n = parseFloat((v||'').replace(/[^0-9.\-]/g,''));
+    return isNaN(n) ? null : n;
+  }
+  function safeDate(v) {
+    if (!v) return null;
+    var m = v.match(/(\d{2})\/(\d{2})\/(\d{4})/);  // DD/MM/YYYY
+    if (m) return m[3]+'-'+m[2]+'-'+m[1];
+    m = v.match(/(\d{4}-\d{2}-\d{2})/);             // YYYY-MM-DD
+    if (m) return m[1];
+    return null;
+  }
+  function g(cols, idx) { return (cols[idx]||'').trim(); }
+
+  fetch(SHEET_CSV_URL)
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+    .then(function(csv) {
+      var allRows = parseFullCSV(csv);
+      if (allRows.length < 2) return;
+      var fresh = [];
+      for (var i=1; i<allRows.length; i++) {
+        var cols = allRows[i];
+        var num = g(cols, COL.NUM);
+        // Validar que sea un número de contrato real: debe tener dígito Y guion
+        if (!num || num.indexOf('-') === -1 || !/\d/.test(num)) continue;
+        fresh.push({
+          num:          num,
+          tipo:         g(cols, COL.TIPO),
+          fecha_inicio: safeDate(g(cols, COL.FI)),
+          fecha_fin:    safeDate(g(cols, COL.FF)),
+          ct:           g(cols, COL.CT),
+          val:          safeNum(g(cols, COL.VAL)),
+          est:          g(cols, COL.EST).toUpperCase(),
+          eq:           g(cols, COL.EQ),
+          fis:          safeNum(g(cols, COL.FIS)),
+          fin:          safeNum(g(cols, COL.FIN)),
+          total_pagado: safeNum(g(cols, COL.PAG)),
+          pagos:        []
+        });
+      }
+      // Deduplicar por número de contrato (primera ocurrencia gana)
+      var seen = {};
+      var deduped = [];
+      for (var j=0; j<fresh.length; j++) {
+        var k = fresh[j].num.trim().toUpperCase();
+        if (!seen[k]) { seen[k]=true; deduped.push(fresh[j]); }
+      }
+      console.log('Sheets RAW: '+fresh.length+' filas → deduplicado: '+deduped.length+' contratos únicos');
+
+      if (deduped.length > 10) {
+        DATA = enrich(deduped);
+        FILTRADOS = DATA.slice();
+        PAGE = 1;
+        renderPage();
+        if (pill) {
+          pill.querySelector('.dot').className = 'dot live';
+          pill.querySelector('.source-label').textContent = 'Google Sheets \u2014 en vivo \u00b7 '+deduped.length+' contratos';
+        }
+      }
+    })
+    .catch(function(e) {
+      console.warn('Sheets no disponible (normal en file://):', e.message);
+    });
+}
+
+window.addEventListener('load', function() {
+  buildEquipoOptions();
+  document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('es-CO', {day:'2-digit',month:'long',year:'numeric'});
+});
+</script>
+</body>
+</html>
